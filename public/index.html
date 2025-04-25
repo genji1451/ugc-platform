@@ -7,6 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>UGC - Onboarding</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * {
       margin: 0;
@@ -258,7 +259,6 @@
       border-color: #555;
     }
   </style>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
   <div class="container">
@@ -341,36 +341,19 @@
   <script>
     // Инициализация Telegram WebApp
     document.addEventListener('DOMContentLoaded', function() {
-      // Активно пытаемся получить Telegram WebApp API
-      const telegramWebApp = window.Telegram?.WebApp;
-      
-      if (telegramWebApp) {
-        console.log("Telegram WebApp найден, расширяю интерфейс");
+      if (window.Telegram && window.Telegram.WebApp) {
+        const webApp = window.Telegram.WebApp;
         
-        // Установить тему
-        if (telegramWebApp.colorScheme === 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
+        // Развернуть WebApp на весь экран
+        webApp.expand();
+        
+        // Установить цвет темы в соответствии с темой Telegram
+        if (webApp.colorScheme === 'dark') {
+          document.body.setAttribute('data-theme', 'dark');
         }
         
-        // Принудительно расширить на весь экран
-        telegramWebApp.expand();
-        
-        // Добавить обработчик событий готовности от Telegram
-        telegramWebApp.onEvent('viewportChanged', function() {
-          console.log("Viewport изменился, адаптируем размер");
-          // Дополнительная попытка расширить если размер изменился
-          telegramWebApp.expand();
-        });
-      } else {
-        console.log("Telegram WebApp не обнаружен, используем стандартный полноэкранный режим");
-        // Активация полноэкранного режима стандартными средствами мобильных браузеров
-        if (document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen();
-        } else if (document.documentElement.webkitRequestFullscreen) {
-          document.documentElement.webkitRequestFullscreen();
-        } else if (document.documentElement.msRequestFullscreen) {
-          document.documentElement.msRequestFullscreen();
-        }
+        // Получить параметры из Telegram WebApp
+        console.log('Telegram WebApp initiated', webApp.initDataUnsafe);
       }
     });
     

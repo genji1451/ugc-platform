@@ -102,18 +102,30 @@ app.post('/api/cart/clear', (req, res) => {
 });
 
 // Route for Telegram WebApp integration
-app.get('/tg/:botId/:appName?', (req, res) => {
-  const { botId, appName } = req.params;
-  console.log(`WebApp accessed by bot: ${botId}, app: ${appName || 'default'}`);
-  // В реальном приложении здесь была бы проверка botId и appName
+app.get('/tg/:botId', (req, res) => {
+  const { botId } = req.params;
+  console.log(`WebApp accessed by bot: ${botId}`);
+  // В реальном приложении здесь была бы проверка botId
   res.redirect('/');
 });
 
-// Direct route for t.me format links
-app.get('/t.me/:botId/:appName?', (req, res) => {
-  const { botId, appName } = req.params;
-  console.log(`t.me link accessed: bot=${botId}, app=${appName || 'default'}`);
-  res.redirect('/');
+// Для полноэкранного режима в Telegram
+app.get('/webapp', (req, res) => {
+  // Получаем параметры из query string
+  const { bot, app } = req.query;
+  console.log(`WebApp fullscreen: bot=${bot || 'unknown'}, app=${app || 'default'}`);
+  // Отправляем страницу с настройками для полноэкранного режима
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Маршрут для WebApp с упрощенным именем - будет работать в Telegram
+app.get('/app', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'webapp.html'));
+});
+
+// Для запросов на tgwebapp
+app.get('/tgwebapp', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'webapp.html'));
 });
 
 // Route for main.html

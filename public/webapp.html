@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Telegram WebApp</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      background-color: var(--tg-theme-bg-color, #ffffff);
+      color: var(--tg-theme-text-color, #000000);
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 500px;
+      padding: 20px;
+    }
+    
+    h1 {
+      margin-bottom: 20px;
+    }
+    
+    .button {
+      background-color: var(--tg-theme-button-color, #2481cc);
+      color: var(--tg-theme-button-text-color, #ffffff);
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      margin: 10px 0;
+      cursor: pointer;
+      width: 100%;
+    }
+    
+    .status {
+      margin: 20px 0;
+      padding: 10px;
+      background-color: rgba(0,0,0,0.05);
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Telegram WebApp Demo</h1>
+    <div class="status" id="status">Инициализация...</div>
+    <button class="button" id="expandBtn">Развернуть на весь экран</button>
+    <button class="button" id="mainBtn">Открыть основной экран</button>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const statusEl = document.getElementById('status');
+      const expandBtn = document.getElementById('expandBtn');
+      const mainBtn = document.getElementById('mainBtn');
+      
+      try {
+        if (window.Telegram && window.Telegram.WebApp) {
+          const webApp = window.Telegram.WebApp;
+          
+          statusEl.textContent = `WebApp инициализирован успешно! Платформа: ${webApp.platform}`;
+          
+          // Автоматически развернуть на весь экран
+          webApp.expand();
+          
+          expandBtn.addEventListener('click', function() {
+            webApp.expand();
+            statusEl.textContent = `Запрошен полноэкранный режим (viewportHeight: ${webApp.viewportHeight}px)`;
+          });
+          
+          mainBtn.addEventListener('click', function() {
+            window.location.href = 'index.html';
+          });
+          
+          // Включить главную кнопку Telegram
+          webApp.MainButton.setText('Продолжить');
+          webApp.MainButton.show();
+          webApp.MainButton.onClick(function() {
+            window.location.href = 'index.html';
+          });
+          
+          // Логирование данных для отладки
+          console.log("WebApp платформа:", webApp.platform);
+          console.log("WebApp версия:", webApp.version);
+          console.log("WebApp цветовая схема:", webApp.colorScheme);
+          console.log("WebApp viewportHeight:", webApp.viewportHeight);
+          console.log("WebApp viewportStableHeight:", webApp.viewportStableHeight);
+          console.log("WebApp isExpanded:", webApp.isExpanded);
+        } else {
+          statusEl.textContent = 'Telegram WebApp API не обнаружен!';
+          statusEl.style.backgroundColor = 'rgba(255,0,0,0.1)';
+        }
+      } catch (error) {
+        statusEl.textContent = `Ошибка: ${error.message}`;
+        statusEl.style.backgroundColor = 'rgba(255,0,0,0.1)';
+        console.error('Ошибка WebApp:', error);
+      }
+    });
+  </script>
+</body>
+</html> 
