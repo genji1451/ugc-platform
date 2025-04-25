@@ -7,6 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>UGC Platform</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * {
       margin: 0;
@@ -39,7 +40,7 @@
       padding: 15px;
       margin: 0 auto;
       padding-bottom: env(safe-area-inset-bottom, 15px);
-      padding-top: env(safe-area-inset-top, 15px);
+      padding-top: env(safe-area-inset-top, 30px);
     }
     
     header {
@@ -49,6 +50,10 @@
       padding: 15px 0;
       border-bottom: 1px solid #eee;
       margin-bottom: 20px;
+      position: sticky;
+      top: env(safe-area-inset-top, 30px);
+      background-color: #f5f5f5;
+      z-index: 10;
     }
     
     .logo {
@@ -257,7 +262,8 @@
       }
       
       header {
-        border-bottom-color: #444;
+        background-color: #232323;
+        border-bottom-color: #333;
       }
       
       .tabs {
@@ -288,14 +294,14 @@
     }
     
     [data-theme="dark"] header {
-      border-bottom-color: #444;
+      background-color: #232323;
+      border-bottom-color: #333;
     }
     
     [data-theme="dark"] .tabs {
       border-bottom-color: #444;
     }
   </style>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
   <div class="container">
@@ -443,41 +449,49 @@
   </div>
 
   <script>
-    // Инициализация Telegram WebApp
-    document.addEventListener('DOMContentLoaded', function() {
-      // Активно пытаемся получить Telegram WebApp API
-      const telegramWebApp = window.Telegram?.WebApp;
-      
-      if (telegramWebApp) {
-        console.log("Telegram WebApp найден, расширяю интерфейс");
+    // Функция для активации полноэкранного режима
+    function enableFullscreen() {
+      if (window.Telegram && window.Telegram.WebApp) {
+        const webApp = window.Telegram.WebApp;
         
-        // Установить тему
-        if (telegramWebApp.colorScheme === 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
+        // Используем новый метод для активации полноэкранного режима
+        if (typeof webApp.requestFullscreen === 'function') {
+          webApp.requestFullscreen();
+        } else {
+          // Фолбэк на старый метод
+          webApp.expand();
         }
         
-        // Принудительно расширить на весь экран
-        telegramWebApp.expand();
-        
-        // Добавить обработчик событий готовности от Telegram
-        telegramWebApp.onEvent('viewportChanged', function() {
-          console.log("Viewport изменился, адаптируем размер");
-          // Дополнительная попытка расширить если размер изменился
-          telegramWebApp.expand();
-        });
-      } else {
-        console.log("Telegram WebApp не обнаружен, используем стандартный полноэкранный режим");
-        // Активация полноэкранного режима стандартными средствами мобильных браузеров
-        if (document.documentElement.requestFullscreen) {
-          document.documentElement.requestFullscreen();
-        } else if (document.documentElement.webkitRequestFullscreen) {
-          document.documentElement.webkitRequestFullscreen();
-        } else if (document.documentElement.msRequestFullscreen) {
-          document.documentElement.msRequestFullscreen();
+        // Установить цвет темы в соответствии с Telegram
+        if (webApp.colorScheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      }
+    }
+    
+    // Запрашиваем полноэкранный режим при загрузке скрипта
+    (function() {
+      enableFullscreen();
+    })();
+    
+    // При загрузке DOM
+    document.addEventListener('DOMContentLoaded', function() {
+      enableFullscreen();
+      
+      // Обработка событий Telegram WebApp
+      if (window.Telegram && window.Telegram.WebApp) {
+        // Обработчики событий для полноэкранного режима
+        if (typeof window.Telegram.WebApp.onEvent === 'function') {
+          window.Telegram.WebApp.onEvent('viewportChanged', enableFullscreen);
         }
       }
     });
-  
+    
+    // Повторный запрос полноэкранного режима после полной загрузки страницы
+    window.onload = function() {
+      setTimeout(enableFullscreen, 100);
+    };
+    
     // Tabs functionality
     const tabs = document.querySelectorAll('.tab');
     const tabContents = document.querySelectorAll('.tab-content');

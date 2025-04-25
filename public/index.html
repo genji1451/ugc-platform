@@ -42,6 +42,7 @@
       height: 100%;
       overflow: hidden;
       position: relative;
+      padding-top: env(safe-area-inset-top, 30px);
     }
     
     .carousel {
@@ -258,10 +259,78 @@
       color: #fff;
       border-color: #555;
     }
+    
+    /* Обеспечиваем корректное поведение при появлении клавиатуры */
+    @media screen and (max-height: 450px) {
+      .indicators {
+        bottom: 60px;
+      }
+      
+      .navigation {
+        bottom: 10px;
+      }
+      
+      .registration {
+        padding-top: 10px;
+        justify-content: flex-start;
+      }
+      
+      .registration h1 {
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+      
+      .registration p {
+        margin-bottom: 15px;
+      }
+      
+      .role-buttons {
+        margin-bottom: 15px;
+      }
+      
+      .role-button {
+        padding: 10px;
+        width: 110px;
+      }
+      
+      .form-group {
+        margin-bottom: 10px;
+      }
+    }
+    
+    /* Стили для состояния с открытой клавиатурой */
+    body.keyboard-open .carousel,
+    body.keyboard-open .indicators {
+      display: none;
+    }
+    
+    body.keyboard-open .registration {
+      display: flex;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      z-index: 100;
+      background-color: var(--tg-theme-bg-color, #ffffff);
+      padding-bottom: 100px; /* Дополнительный отступ внизу для кнопки */
+    }
+    
+    body.keyboard-open .registration h1 {
+      margin-top: 10px;
+    }
+    
+    /* Стили для безопасных областей во всем приложении */
+    .main-content {
+      padding-top: env(safe-area-inset-top, 30px);
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+    }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container main-content">
     <!-- Carousel -->
     <div class="carousel" id="carousel">
       <div class="slide">
@@ -378,10 +447,40 @@
       }
     });
     
-    // Повторный запрос полноэкранного режима после полной загрузки страницы
+    // Запрос полноэкранного режима после полной загрузки страницы
     window.onload = function() {
       setTimeout(enableFullscreen, 100);
     };
+    
+    // Обработка появления клавиатуры
+    let originalHeight = window.innerHeight;
+    
+    window.addEventListener('resize', function() {
+      // Если высота окна уменьшилась, значит появилась клавиатура
+      if (window.innerHeight < originalHeight) {
+        document.body.classList.add('keyboard-open');
+        
+        // Прокручиваем до активного поля ввода с небольшой задержкой
+        setTimeout(function() {
+          const activeElement = document.activeElement;
+          if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') {
+            activeElement.scrollIntoView({behavior: 'smooth', block: 'center'});
+            
+            // Дополнительно подстраиваем кнопку регистрации, чтобы она была видна
+            const registerBtn = document.getElementById('registerBtn');
+            if (registerBtn) {
+              setTimeout(function() {
+                registerBtn.scrollIntoView({behavior: 'smooth', block: 'end'});
+              }, 300);
+            }
+          }
+        }, 300);
+      } else {
+        // Клавиатура скрыта, возвращаем исходное состояние
+        document.body.classList.remove('keyboard-open');
+        originalHeight = window.innerHeight;
+      }
+    });
     
     // Disable page scrolling
     document.addEventListener('touchmove', function(e) {
