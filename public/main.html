@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UGC Platform</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 20px;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #007bff;
+    }
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #007bff;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .tab.active {
+      border-bottom-color: #007bff;
+      color: #007bff;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .card-content {
+      line-height: 1.5;
+    }
+    .categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .category {
+      padding: 8px 16px;
+      background-color: #eee;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .category.active {
+      background-color: #007bff;
+      color: white;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .item {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .item img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+    .item-content {
+      padding: 15px;
+    }
+    .item-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .item-description {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+    .item-price {
+      font-weight: bold;
+      color: #007bff;
+    }
+    .button {
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      display: inline-block;
+    }
+    .cart-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">UGC</div>
+      <div class="user-menu">
+        <div class="notifications">📬</div>
+        <div class="avatar">U</div>
+      </div>
+    </header>
+    
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-tab="marketplace">Маркетплейс</div>
+      <div class="tab" data-tab="influencers">Инфлюенсеры</div>
+      <div class="tab" data-tab="projects">Мои проекты</div>
+      <div class="tab" data-tab="profile">Профиль</div>
+    </div>
+    
+    <div class="tab-content active" id="marketplace">
+      <div class="card">
+        <div class="card-title">Добро пожаловать на UGC платформу!</div>
+        <div class="card-content">
+          Здесь вы можете найти товары для создания контента или заказать UGC от инфлюенсеров.
+        </div>
+      </div>
+      
+      <h2>Категории</h2>
+      <div class="categories" id="categories">
+        <div class="category active">Все</div>
+        <div class="category">Одежда и аксессуары</div>
+        <div class="category">Красота и уход</div>
+        <div class="category">Электроника</div>
+        <div class="category">Дом и интерьер</div>
+        <div class="category">Спорт и отдых</div>
+      </div>
+      
+      <div class="grid" id="products">
+        <div class="item">
+          <img src="https://via.placeholder.com/300x150?text=Product+1" alt="Product 1">
+          <div class="item-content">
+            <div class="item-title">Футболка Oversize</div>
+            <div class="item-description">Стильная хлопковая футболка oversize</div>
+            <div class="item-price">1200 ₽</div>
+            <button class="button">Добавить в корзину</button>
+          </div>
+        </div>
+        <div class="item">
+          <img src="https://via.placeholder.com/300x150?text=Product+2" alt="Product 2">
+          <div class="item-content">
+            <div class="item-title">Набор косметики</div>
+            <div class="item-description">Подарочный набор для ухода за кожей</div>
+            <div class="item-price">По запросу</div>
+            <button class="button">Добавить в корзину</button>
+          </div>
+        </div>
+        <div class="item">
+          <img src="https://via.placeholder.com/300x150?text=Product+3" alt="Product 3">
+          <div class="item-content">
+            <div class="item-title">Беспроводные наушники</div>
+            <div class="item-description">Качественный звук и долгое время работы</div>
+            <div class="item-price">3500 ₽</div>
+            <button class="button">Добавить в корзину</button>
+          </div>
+        </div>
+        <div class="item">
+          <img src="https://via.placeholder.com/300x150?text=Product+4" alt="Product 4">
+          <div class="item-content">
+            <div class="item-title">Умный светильник</div>
+            <div class="item-description">Меняет цвет и яркость через приложение</div>
+            <div class="item-price">2100 ₽</div>
+            <button class="button">Добавить в корзину</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="influencers">
+      <h2>Инфлюенсеры</h2>
+      <div class="grid" id="influencers-list">
+        <div class="item">
+          <img src="https://via.placeholder.com/300x150?text=Influencer+1" alt="Influencer 1">
+          <div class="item-content">
+            <div class="item-title">Мария @beauty_maria</div>
+            <div class="item-description">Бьюти-блогер, снимаю обзоры и гайды по макияжу. Охваты до 25k.</div>
+            <div class="item-price">от 5000 ₽</div>
+            <button class="button">Связаться</button>
+          </div>
+        </div>
+        <div class="item">
+          <img src="https://via.placeholder.com/300x150?text=Influencer+2" alt="Influencer 2">
+          <div class="item-content">
+            <div class="item-title">Иван @tech_ivan</div>
+            <div class="item-description">Гаджеты, распаковки, лайфхаки. На связи с подписчиками.</div>
+            <div class="item-price">от 7000 ₽</div>
+            <button class="button">Связаться</button>
+          </div>
+        </div>
+        <div class="item">
+          <img src="https://via.placeholder.com/300x150?text=Influencer+3" alt="Influencer 3">
+          <div class="item-content">
+            <div class="item-title">Анна @anna_lifestyle</div>
+            <div class="item-description">Лайфстайл, уход за собой, обзоры косметики и одежды.</div>
+            <div class="item-price">от 4000 ₽</div>
+            <button class="button">Связаться</button>
+          </div>
+        </div>
+        <div class="item">
+          <img src="https://via.placeholder.com/300x150?text=Influencer+4" alt="Influencer 4">
+          <div class="item-content">
+            <div class="item-title">Сергей @sport_sergey</div>
+            <div class="item-description">Спорт, ЗОЖ, обзоры спортивного питания и экипировки.</div>
+            <div class="item-price">от 6000 ₽</div>
+            <button class="button">Связаться</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="projects">
+      <h2>Мои проекты</h2>
+      <div class="card">
+        <div class="card-content">
+          У вас пока нет активных проектов. Создайте новый проект или разместите заказ.
+        </div>
+        <button class="button">Новый проект</button>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="profile">
+      <h2>Мой профиль</h2>
+      <div class="card">
+        <div class="card-content">
+          <p><strong>Имя:</strong> <span id="profile-name">Пользователь</span></p>
+          <p><strong>Email:</strong> <span id="profile-email">user@example.com</span></p>
+          <p><strong>Телефон:</strong> <span id="profile-phone">+7 (XXX) XXX-XX-XX</span></p>
+          <p><strong>Роль:</strong> <span id="profile-role">Заказчик</span></p>
+        </div>
+        <button class="button">Редактировать профиль</button>
+      </div>
+    </div>
+    
+    <div class="cart-button" id="cart-button">
+      Корзина (<span id="cart-count">0</span>)
+    </div>
+  </div>
+
+  <script>
+    // Tabs functionality
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabId = tab.getAttribute('data-tab');
+        
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        tab.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+    
+    // Categories
+    const categories = document.querySelectorAll('.category');
+    
+    categories.forEach(category => {
+      category.addEventListener('click', () => {
+        categories.forEach(c => c.classList.remove('active'));
+        category.classList.add('active');
+        // Filter products logic would go here
+      });
+    });
+    
+    // Cart functionality
+    const cartButton = document.getElementById('cart-button');
+    let cartCount = 0;
+    
+    document.querySelectorAll('.button').forEach(button => {
+      if (button.textContent === 'Добавить в корзину') {
+        button.addEventListener('click', () => {
+          cartCount++;
+          document.getElementById('cart-count').textContent = cartCount;
+          alert('Товар добавлен в корзину!');
+        });
+      }
+    });
+    
+    cartButton.addEventListener('click', () => {
+      alert('Переход в корзину');
+    });
+    
+    // Populate profile data from registration if available
+    window.addEventListener('load', () => {
+      // In a real app, you'd get this from localStorage, sessionStorage or from the server
+      // For demo purposes, we'll check if there's any data in localStorage
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        const user = JSON.parse(userData);
+        document.getElementById('profile-name').textContent = user.name;
+        document.getElementById('profile-email').textContent = user.email;
+        document.getElementById('profile-phone').textContent = user.phone;
+        document.getElementById('profile-role').textContent = user.role === 'blogger' ? 'Блогер' : 'Заказчик';
+      }
+    });
+  </script>
+</body>
+</html> 
