@@ -341,19 +341,53 @@
   <script>
     // Инициализация Telegram WebApp
     document.addEventListener('DOMContentLoaded', function() {
-      if (window.Telegram && window.Telegram.WebApp) {
-        const webApp = window.Telegram.WebApp;
-        
-        // Развернуть WebApp на весь экран
-        webApp.expand();
-        
-        // Установить цвет темы в соответствии с темой Telegram
-        if (webApp.colorScheme === 'dark') {
-          document.body.setAttribute('data-theme', 'dark');
+      try {
+        console.log('DOM загружен, проверяем наличие Telegram WebApp');
+        if (window.Telegram && window.Telegram.WebApp) {
+          const webApp = window.Telegram.WebApp;
+          console.log('Telegram WebApp найден, платформа:', webApp.platform);
+          
+          // Проверяем, доступен ли метод requestFullscreen
+          if (typeof webApp.requestFullscreen === 'function') {
+            // Используем новый метод для полноэкранного режима
+            webApp.requestFullscreen();
+            console.log('Запрошен полноэкранный режим (requestFullscreen)');
+            
+            // Обрабатываем события полноэкранного режима
+            webApp.onEvent('fullscreenChanged', function() {
+              console.log('Состояние полноэкранного режима изменилось:', webApp.isFullscreen);
+            });
+            
+            webApp.onEvent('fullscreenFailed', function(error) {
+              console.error('Ошибка полноэкранного режима:', error);
+            });
+          } else {
+            // Используем метод expand как запасной вариант
+            console.log('requestFullscreen не доступен, используем expand');
+            webApp.expand();
+          }
+          
+          // Установить цвет темы в соответствии с темой Telegram
+          if (webApp.colorScheme === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+          }
+          
+          // Добавим пробу через 1 секунду для гарантии полноэкранного режима
+          setTimeout(function() {
+            if (typeof webApp.requestFullscreen === 'function' && !webApp.isFullscreen) {
+              webApp.requestFullscreen();
+              console.log('Повторная попытка запроса полноэкранного режима');
+            } else if (!webApp.isFullscreen) {
+              webApp.expand();
+              console.log('Повторная попытка expand');
+            }
+          }, 1000);
+          
+        } else {
+          console.warn('Telegram WebApp не найден');
         }
-        
-        // Получить параметры из Telegram WebApp
-        console.log('Telegram WebApp initiated', webApp.initDataUnsafe);
+      } catch (error) {
+        console.error('Ошибка инициализации Telegram WebApp:', error);
       }
     });
     

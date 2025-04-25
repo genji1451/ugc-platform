@@ -151,5 +151,11 @@ app.get('/startapp/:appname', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'webapp.html'));
 });
 
+// Маршрут для полноэкранного режима
+app.get(['/fullscreen', '/fs'], (req, res) => {
+  console.log('Запрошен полноэкранный режим');
+  res.sendFile(path.join(__dirname, 'public', 'fullscreen.html'));
+});
+
 // Listen on the specified port
 app.listen(PORT, () => console.log(`🚀 UGC Platform running at http://localhost:${PORT}`));

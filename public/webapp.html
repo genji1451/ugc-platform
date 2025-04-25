@@ -108,10 +108,28 @@
       debugEl.innerHTML += info + '<br>';
     }
     
-    // Принудительно вызываем функцию расширения сразу при загрузке скрипта
-    if (window.Telegram && window.Telegram.WebApp) {
-      window.Telegram.WebApp.expand();
-      updateDebugInfo('Вызов expand() из глобальной области');
+    // Проверяем наличие WebApp API сразу при загрузке скрипта
+    try {
+      if (window.Telegram && window.Telegram.WebApp) {
+        const webApp = window.Telegram.WebApp;
+        
+        // Проверяем, находимся ли мы уже в полноэкранном режиме
+        if (webApp.isFullscreen) {
+          updateDebugInfo('Уже в полноэкранном режиме при загрузке скрипта');
+        } else {
+          // Запрашиваем полноэкранный режим через новый метод
+          if (typeof webApp.requestFullscreen === 'function') {
+            webApp.requestFullscreen();
+            updateDebugInfo('Вызов requestFullscreen() из глобальной области');
+          } else {
+            // Фолбэк на старый метод expand
+            webApp.expand();
+            updateDebugInfo('Вызов expand() из глобальной области (requestFullscreen не доступен)');
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Ошибка при инициализации:', e);
     }
     
     document.addEventListener('DOMContentLoaded', function() {
@@ -126,55 +144,67 @@
           const webApp = window.Telegram.WebApp;
           updateDebugInfo(`WebApp API доступен, платформа: ${webApp.platform}`);
           
-          // Устанавливаем обработчик события готовности WebApp
-          webApp.onEvent('viewportChanged', function() {
-            updateDebugInfo(`Событие viewportChanged, height=${webApp.viewportHeight}`);
-            webApp.expand();
+          // Слушаем событие изменения полноэкранного режима
+          webApp.onEvent('fullscreenChanged', function() {
+            updateDebugInfo(`Событие fullscreenChanged, isFullscreen=${webApp.isFullscreen}`);
+            statusEl.textContent = webApp.isFullscreen 
+              ? 'Полноэкранный режим активирован' 
+              : 'Выход из полноэкранного режима';
           });
           
-          // Принудительно расширяем WebApp на весь экран несколько раз с таймаутами
-          webApp.expand();
-          updateDebugInfo('1й вызов expand()');
+          // Слушаем событие ошибки полноэкранного режима
+          webApp.onEvent('fullscreenFailed', function(error) {
+            updateDebugInfo(`Ошибка полноэкранного режима: ${JSON.stringify(error)}`);
+            statusEl.textContent = `Не удалось активировать полноэкранный режим: ${error ? error.error : 'неизвестная ошибка'}`;
+            statusEl.style.backgroundColor = 'rgba(255,0,0,0.1)';
+          });
           
-          setTimeout(() => {
-            webApp.expand();
-            updateDebugInfo('2й вызов expand() через 300мс');
-          }, 300);
+          // Слушаем событие viewportChanged
+          webApp.onEvent('viewportChanged', function() {
+            updateDebugInfo(`Событие viewportChanged, height=${webApp.viewportHeight}`);
+            
+            // Пытаемся запросить полноэкранный режим снова
+            if (!webApp.isFullscreen && typeof webApp.requestFullscreen === 'function') {
+              webApp.requestFullscreen();
+              updateDebugInfo('Повторный запрос requestFullscreen после viewportChanged');
+            }
+          });
           
-          setTimeout(() => {
-            webApp.expand();
-            updateDebugInfo('3й вызов expand() через 1000мс');
-            statusEl.textContent = `WebApp готов, высота: ${webApp.viewportHeight}px`;
-          }, 1000);
-          
-          // Настройка кнопок
+          // Настраиваем кнопку развертывания
+          expandBtn.innerText = 'Включить полноэкранный режим';
           expandBtn.addEventListener('click', function() {
-            webApp.expand();
-            statusEl.textContent = `Запрошен полноэкранный режим`;
-            updateDebugInfo(`Клик по кнопке expand, height=${webApp.viewportHeight}`);
+            if (typeof webApp.requestFullscreen === 'function') {
+              webApp.requestFullscreen();
+              updateDebugInfo('requestFullscreen вызван через кнопку');
+              statusEl.textContent = 'Запрошен полноэкранный режим';
+            } else {
+              webApp.expand();
+              updateDebugInfo('expand вызван через кнопку (requestFullscreen не доступен)');
+              statusEl.textContent = 'Запрошен расширенный режим (старый метод)';
+            }
           });
           
           mainBtn.addEventListener('click', function() {
             window.location.href = 'index.html';
           });
           
-          // Настройка MainButton
-          if (webApp.MainButton) {
-            webApp.MainButton.setText('В приложение');
-            webApp.MainButton.onClick(function() {
-              window.location.href = 'index.html';
-            });
-            webApp.MainButton.show();
-            updateDebugInfo('MainButton настроена');
-          } else {
-            updateDebugInfo('MainButton недоступна');
-          }
-          
           // Отладочная информация
           updateDebugInfo(`Версия: ${webApp.version}`);
           updateDebugInfo(`Цветовая схема: ${webApp.colorScheme}`);
+          updateDebugInfo(`Полноэкранный режим: ${webApp.isFullscreen ? 'Да' : 'Нет'}`);
           updateDebugInfo(`ViewportHeight: ${webApp.viewportHeight}`);
-          updateDebugInfo(`isExpanded: ${webApp.isExpanded}`);
+          
+          // Пробуем запросить полноэкранный режим через таймер
+          setTimeout(() => {
+            if (!webApp.isFullscreen && typeof webApp.requestFullscreen === 'function') {
+              webApp.requestFullscreen();
+              updateDebugInfo('requestFullscreen вызван через таймер (500мс)');
+            } else if (!webApp.isFullscreen) {
+              webApp.expand();
+              updateDebugInfo('expand вызван через таймер (500мс)');
+            }
+          }, 500);
+          
         } else {
           statusEl.textContent = 'Telegram WebApp API не найден';
           statusEl.style.backgroundColor = 'rgba(255,0,0,0.1)';
@@ -187,12 +217,23 @@
       }
     });
     
-    // Дополнительная попытка расширения экрана после полной загрузки страницы
+    // Дополнительная попытка после полной загрузки страницы
     window.onload = function() {
       updateDebugInfo('window.onload сработал');
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.expand();
-        updateDebugInfo('Вызов expand() из window.onload');
+      try {
+        if (window.Telegram && window.Telegram.WebApp) {
+          const webApp = window.Telegram.WebApp;
+          
+          if (!webApp.isFullscreen && typeof webApp.requestFullscreen === 'function') {
+            webApp.requestFullscreen();
+            updateDebugInfo('requestFullscreen вызван из window.onload');
+          } else if (!webApp.isFullscreen) {
+            webApp.expand();
+            updateDebugInfo('expand вызван из window.onload');
+          }
+        }
+      } catch (e) {
+        updateDebugInfo(`Ошибка в onload: ${e.message}`);
       }
     };
   </script>
