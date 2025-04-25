@@ -151,9 +151,14 @@ app.get('/startapp/:appname', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'webapp.html'));
 });
 
-// Маршрут для полноэкранного режима
-app.get(['/fullscreen', '/fs'], (req, res) => {
+// Маршруты для полноэкранного режима
+app.get('/fullscreen', (req, res) => {
   console.log('Запрошен полноэкранный режим');
+  res.sendFile(path.join(__dirname, 'public', 'fullscreen.html'));
+});
+
+app.get('/fs', (req, res) => {
+  console.log('Запрошен полноэкранный режим (краткий путь)');
   res.sendFile(path.join(__dirname, 'public', 'fullscreen.html'));
 });
 
