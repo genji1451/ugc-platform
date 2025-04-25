@@ -101,6 +101,13 @@ app.post('/api/cart/clear', (req, res) => {
   res.json({ success: true });
 });
 
+// Route for Telegram WebApp integration
+app.get('/tg/:botId', (req, res) => {
+  const { botId } = req.params;
+  // In a real app, you would validate botId and handle Telegram WebApp initialization
+  res.redirect('/');
+});
+
 // Route for main.html
 app.get('/main.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'main.html'));
@@ -112,4 +119,4 @@ app.get('/', (req, res) => {
 });
 
 // Listen on the specified port
-app.listen(PORT, () => console.log(`🚀 Telegram WebApp running at http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`🚀 UGC Platform running at http://localhost:${PORT}`));
