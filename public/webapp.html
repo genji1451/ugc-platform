@@ -103,138 +103,58 @@
   </div>
 
   <script>
-    function updateDebugInfo(info) {
-      const debugEl = document.getElementById('debugInfo');
-      debugEl.innerHTML += info + '<br>';
-    }
-    
-    // Проверяем наличие WebApp API сразу при загрузке скрипта
-    try {
+    // Функция для активации полноэкранного режима
+    function enableFullscreen() {
       if (window.Telegram && window.Telegram.WebApp) {
         const webApp = window.Telegram.WebApp;
         
-        // Проверяем, находимся ли мы уже в полноэкранном режиме
-        if (webApp.isFullscreen) {
-          updateDebugInfo('Уже в полноэкранном режиме при загрузке скрипта');
+        // Используем новый метод для активации полноэкранного режима
+        if (typeof webApp.requestFullscreen === 'function') {
+          webApp.requestFullscreen();
         } else {
-          // Запрашиваем полноэкранный режим через новый метод
-          if (typeof webApp.requestFullscreen === 'function') {
-            webApp.requestFullscreen();
-            updateDebugInfo('Вызов requestFullscreen() из глобальной области');
-          } else {
-            // Фолбэк на старый метод expand
-            webApp.expand();
-            updateDebugInfo('Вызов expand() из глобальной области (requestFullscreen не доступен)');
-          }
+          // Фолбэк на старый метод
+          webApp.expand();
+        }
+        
+        // Установить цвет темы в соответствии с Telegram
+        if (webApp.colorScheme === 'dark') {
+          document.body.setAttribute('data-theme', 'dark');
         }
       }
-    } catch (e) {
-      console.error('Ошибка при инициализации:', e);
     }
     
+    // Запрашиваем полноэкранный режим при загрузке скрипта
+    (function() {
+      enableFullscreen();
+    })();
+    
+    // Инициализация при загрузке DOM
     document.addEventListener('DOMContentLoaded', function() {
-      const statusEl = document.getElementById('status');
-      const expandBtn = document.getElementById('expandBtn');
-      const mainBtn = document.getElementById('mainBtn');
+      enableFullscreen();
       
-      updateDebugInfo('DOMContentLoaded сработал');
-      
-      try {
-        if (window.Telegram && window.Telegram.WebApp) {
-          const webApp = window.Telegram.WebApp;
-          updateDebugInfo(`WebApp API доступен, платформа: ${webApp.platform}`);
-          
-          // Слушаем событие изменения полноэкранного режима
-          webApp.onEvent('fullscreenChanged', function() {
-            updateDebugInfo(`Событие fullscreenChanged, isFullscreen=${webApp.isFullscreen}`);
-            statusEl.textContent = webApp.isFullscreen 
-              ? 'Полноэкранный режим активирован' 
-              : 'Выход из полноэкранного режима';
-          });
-          
-          // Слушаем событие ошибки полноэкранного режима
-          webApp.onEvent('fullscreenFailed', function(error) {
-            updateDebugInfo(`Ошибка полноэкранного режима: ${JSON.stringify(error)}`);
-            statusEl.textContent = `Не удалось активировать полноэкранный режим: ${error ? error.error : 'неизвестная ошибка'}`;
-            statusEl.style.backgroundColor = 'rgba(255,0,0,0.1)';
-          });
-          
-          // Слушаем событие viewportChanged
-          webApp.onEvent('viewportChanged', function() {
-            updateDebugInfo(`Событие viewportChanged, height=${webApp.viewportHeight}`);
-            
-            // Пытаемся запросить полноэкранный режим снова
-            if (!webApp.isFullscreen && typeof webApp.requestFullscreen === 'function') {
-              webApp.requestFullscreen();
-              updateDebugInfo('Повторный запрос requestFullscreen после viewportChanged');
-            }
-          });
-          
-          // Настраиваем кнопку развертывания
-          expandBtn.innerText = 'Включить полноэкранный режим';
-          expandBtn.addEventListener('click', function() {
-            if (typeof webApp.requestFullscreen === 'function') {
-              webApp.requestFullscreen();
-              updateDebugInfo('requestFullscreen вызван через кнопку');
-              statusEl.textContent = 'Запрошен полноэкранный режим';
-            } else {
-              webApp.expand();
-              updateDebugInfo('expand вызван через кнопку (requestFullscreen не доступен)');
-              statusEl.textContent = 'Запрошен расширенный режим (старый метод)';
-            }
-          });
-          
-          mainBtn.addEventListener('click', function() {
+      // Обработка событий Telegram WebApp
+      if (window.Telegram && window.Telegram.WebApp) {
+        const webApp = window.Telegram.WebApp;
+        
+        // Повторный запрос при изменении размера окна
+        if (typeof webApp.onEvent === 'function') {
+          webApp.onEvent('viewportChanged', enableFullscreen);
+        }
+        
+        // Настройка MainButton если доступно
+        if (webApp.MainButton) {
+          webApp.MainButton.setText('Продолжить');
+          webApp.MainButton.show();
+          webApp.MainButton.onClick(function() {
             window.location.href = 'index.html';
           });
-          
-          // Отладочная информация
-          updateDebugInfo(`Версия: ${webApp.version}`);
-          updateDebugInfo(`Цветовая схема: ${webApp.colorScheme}`);
-          updateDebugInfo(`Полноэкранный режим: ${webApp.isFullscreen ? 'Да' : 'Нет'}`);
-          updateDebugInfo(`ViewportHeight: ${webApp.viewportHeight}`);
-          
-          // Пробуем запросить полноэкранный режим через таймер
-          setTimeout(() => {
-            if (!webApp.isFullscreen && typeof webApp.requestFullscreen === 'function') {
-              webApp.requestFullscreen();
-              updateDebugInfo('requestFullscreen вызван через таймер (500мс)');
-            } else if (!webApp.isFullscreen) {
-              webApp.expand();
-              updateDebugInfo('expand вызван через таймер (500мс)');
-            }
-          }, 500);
-          
-        } else {
-          statusEl.textContent = 'Telegram WebApp API не найден';
-          statusEl.style.backgroundColor = 'rgba(255,0,0,0.1)';
-          updateDebugInfo('WebApp API не обнаружен');
         }
-      } catch (error) {
-        statusEl.textContent = `Ошибка: ${error.message}`;
-        statusEl.style.backgroundColor = 'rgba(255,0,0,0.1)';
-        updateDebugInfo(`Ошибка: ${error.message}`);
       }
     });
     
-    // Дополнительная попытка после полной загрузки страницы
+    // Повторный запрос полноэкранного режима после полной загрузки страницы
     window.onload = function() {
-      updateDebugInfo('window.onload сработал');
-      try {
-        if (window.Telegram && window.Telegram.WebApp) {
-          const webApp = window.Telegram.WebApp;
-          
-          if (!webApp.isFullscreen && typeof webApp.requestFullscreen === 'function') {
-            webApp.requestFullscreen();
-            updateDebugInfo('requestFullscreen вызван из window.onload');
-          } else if (!webApp.isFullscreen) {
-            webApp.expand();
-            updateDebugInfo('expand вызван из window.onload');
-          }
-        }
-      } catch (e) {
-        updateDebugInfo(`Ошибка в onload: ${e.message}`);
-      }
+      setTimeout(enableFullscreen, 100);
     };
   </script>
 </body>

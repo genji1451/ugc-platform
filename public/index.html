@@ -339,57 +339,49 @@
   </div>
 
   <script>
+    // Функция для активации полноэкранного режима
+    function enableFullscreen() {
+      if (window.Telegram && window.Telegram.WebApp) {
+        const webApp = window.Telegram.WebApp;
+        
+        // Используем новый метод для активации полноэкранного режима
+        if (typeof webApp.requestFullscreen === 'function') {
+          webApp.requestFullscreen();
+        } else {
+          // Фолбэк на старый метод
+          webApp.expand();
+        }
+        
+        // Установить цвет темы в соответствии с Telegram
+        if (webApp.colorScheme === 'dark') {
+          document.body.setAttribute('data-theme', 'dark');
+        }
+      }
+    }
+    
+    // Запрашиваем полноэкранный режим при загрузке скрипта
+    (function() {
+      enableFullscreen();
+    })();
+    
     // Инициализация Telegram WebApp
     document.addEventListener('DOMContentLoaded', function() {
-      try {
-        console.log('DOM загружен, проверяем наличие Telegram WebApp');
-        if (window.Telegram && window.Telegram.WebApp) {
-          const webApp = window.Telegram.WebApp;
-          console.log('Telegram WebApp найден, платформа:', webApp.platform);
-          
-          // Проверяем, доступен ли метод requestFullscreen
-          if (typeof webApp.requestFullscreen === 'function') {
-            // Используем новый метод для полноэкранного режима
-            webApp.requestFullscreen();
-            console.log('Запрошен полноэкранный режим (requestFullscreen)');
-            
-            // Обрабатываем события полноэкранного режима
-            webApp.onEvent('fullscreenChanged', function() {
-              console.log('Состояние полноэкранного режима изменилось:', webApp.isFullscreen);
-            });
-            
-            webApp.onEvent('fullscreenFailed', function(error) {
-              console.error('Ошибка полноэкранного режима:', error);
-            });
-          } else {
-            // Используем метод expand как запасной вариант
-            console.log('requestFullscreen не доступен, используем expand');
-            webApp.expand();
-          }
-          
-          // Установить цвет темы в соответствии с темой Telegram
-          if (webApp.colorScheme === 'dark') {
-            document.body.setAttribute('data-theme', 'dark');
-          }
-          
-          // Добавим пробу через 1 секунду для гарантии полноэкранного режима
-          setTimeout(function() {
-            if (typeof webApp.requestFullscreen === 'function' && !webApp.isFullscreen) {
-              webApp.requestFullscreen();
-              console.log('Повторная попытка запроса полноэкранного режима');
-            } else if (!webApp.isFullscreen) {
-              webApp.expand();
-              console.log('Повторная попытка expand');
-            }
-          }, 1000);
-          
-        } else {
-          console.warn('Telegram WebApp не найден');
+      enableFullscreen();
+      
+      if (window.Telegram && window.Telegram.WebApp) {
+        const webApp = window.Telegram.WebApp;
+        
+        // Обработчики событий для полноэкранного режима
+        if (typeof webApp.onEvent === 'function') {
+          webApp.onEvent('viewportChanged', enableFullscreen);
         }
-      } catch (error) {
-        console.error('Ошибка инициализации Telegram WebApp:', error);
       }
     });
+    
+    // Повторный запрос полноэкранного режима после полной загрузки страницы
+    window.onload = function() {
+      setTimeout(enableFullscreen, 100);
+    };
     
     // Disable page scrolling
     document.addEventListener('touchmove', function(e) {

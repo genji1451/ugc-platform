@@ -5,40 +5,112 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <title>Fullscreen Telegram Mini App</title>
+  <title>UGC Платформа</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    html, body {
+    *, *::before, *::after {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+    
+    html, body {
       height: 100%;
       width: 100%;
       overflow: hidden;
       position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background-color: var(--tg-theme-bg-color, #fff);
       color: var(--tg-theme-text-color, #000);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
     }
     
-    .container {
+    .app {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      width: 100%;
+    }
+    
+    .header {
+      background-color: var(--tg-theme-bg-color, #fff);
+      color: var(--tg-theme-text-color, #000);
+      text-align: center;
+      padding: 16px;
+      font-weight: bold;
+      font-size: 18px;
+      border-bottom: 1px solid var(--tg-theme-hint-color, rgba(0,0,0,0.1));
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 100;
+    }
+    
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
       padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100%;
-      box-sizing: border-box;
+    }
+    
+    .welcome-section {
+      text-align: center;
+      padding: 20px 0;
+      margin-bottom: 20px;
     }
     
     .logo {
-      font-size: 60px;
-      margin-bottom: 30px;
+      font-size: 64px;
+      margin-bottom: 20px;
     }
     
     .title {
-      font-size: 24px;
+      font-size: 28px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    
+    .subtitle {
+      font-size: 16px;
+      color: var(--tg-theme-hint-color, rgba(0,0,0,0.5));
       margin-bottom: 20px;
-      text-align: center;
+      line-height: 1.4;
+    }
+    
+    .card {
+      background-color: var(--tg-theme-bg-color, #fff);
+      border-radius: 12px;
+      padding: 16px;
+      width: 100%;
+      max-width: 450px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid var(--tg-theme-hint-color, rgba(0,0,0,0.1));
+    }
+    
+    .card-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+    
+    .card-content {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--tg-theme-text-color, #000);
     }
     
     .btn {
@@ -50,155 +122,191 @@
       border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
-      min-width: 200px;
+      width: 100%;
+      max-width: 450px;
       text-align: center;
+      transition: opacity 0.2s ease;
     }
     
-    .status {
-      background-color: rgba(0, 0, 0, 0.05);
-      padding: 10px;
-      border-radius: 8px;
-      margin: 10px 0;
-      width: 100%;
-      max-width: 300px;
+    .btn:active {
+      opacity: 0.8;
+    }
+    
+    .footer {
+      padding: 16px;
       text-align: center;
+      font-size: 14px;
+      color: var(--tg-theme-hint-color, rgba(0,0,0,0.5));
+      background-color: var(--tg-theme-bg-color, #fff);
+      border-top: 1px solid var(--tg-theme-hint-color, rgba(0,0,0,0.1));
+    }
+    
+    /* Grid для категорий */
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      width: 100%;
+      max-width: 450px;
+      margin-bottom: 20px;
+    }
+    
+    .category-item {
+      background-color: var(--tg-theme-bg-color, #fff);
+      border: 1px solid var(--tg-theme-hint-color, rgba(0,0,0,0.1));
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+    
+    .category-item:active {
+      transform: scale(0.98);
+    }
+    
+    .category-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    
+    .category-name {
+      font-size: 14px;
+      font-weight: 500;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="logo">🚀</div>
-    <h1 class="title">UGC Платформа</h1>
-    <div class="status" id="status">Загрузка...</div>
-    <button class="btn" id="fullscreenBtn">Включить полноэкранный режим</button>
-    <button class="btn" id="continueBtn">Перейти в приложение</button>
+  <div class="app">
+    <div class="header">
+      UGC Платформа
+    </div>
+    
+    <div class="content">
+      <div class="welcome-section">
+        <div class="logo">🚀</div>
+        <h1 class="title">Добро пожаловать!</h1>
+        <p class="subtitle">Платформа для связи креативных создателей и брендов</p>
+      </div>
+      
+      <div class="categories-grid">
+        <div class="category-item">
+          <div class="category-icon">👕</div>
+          <div class="category-name">Одежда</div>
+        </div>
+        <div class="category-item">
+          <div class="category-icon">💄</div>
+          <div class="category-name">Красота</div>
+        </div>
+        <div class="category-item">
+          <div class="category-icon">📱</div>
+          <div class="category-name">Гаджеты</div>
+        </div>
+        <div class="category-item">
+          <div class="category-icon">🏠</div>
+          <div class="category-name">Дом</div>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title">Что такое UGC?</div>
+        <div class="card-content">
+          UGC (User-Generated Content) — это контент, созданный пользователями для брендов. 
+          Аутентичные материалы, которые вызывают больше доверия у аудитории.
+        </div>
+      </div>
+      
+      <button class="btn" id="exploreBtn">Исследовать платформу</button>
+      <button class="btn" id="registerBtn">Зарегистрироваться</button>
+    </div>
+    
+    <div class="footer">
+      UGC Platform © 2023
+    </div>
   </div>
   
   <script>
-    // Простая функция для обновления статуса
-    function updateStatus(message) {
-      document.getElementById('status').textContent = message;
-      console.log(message);
-    }
-    
-    // Функция для запроса полноэкранного режима
-    function requestFullscreenMode() {
+    // Функция для активации полноэкранного режима
+    function enableFullscreen() {
       if (window.Telegram && window.Telegram.WebApp) {
         const webApp = window.Telegram.WebApp;
         
-        if (typeof webApp.requestFullscreen === 'function') {
-          try {
-            webApp.requestFullscreen();
-            updateStatus("Запрошен полноэкранный режим");
-            return true;
-          } catch (e) {
-            updateStatus("Ошибка при запросе полноэкранного режима: " + e.message);
-            console.error(e);
-          }
-        } else {
-          // Фолбэк на старый метод
-          try {
-            webApp.expand();
-            updateStatus("Запрошен расширенный режим (устаревший метод)");
-            return true;
-          } catch (e) {
-            updateStatus("Ошибка при расширении интерфейса: " + e.message);
-            console.error(e);
-          }
-        }
-      } else {
-        updateStatus("Telegram WebApp API не обнаружен");
-        return false;
-      }
-      return false;
-    }
-    
-    // Инициализация при загрузке скрипта (до DOMContentLoaded)
-    (function() {
-      if (window.Telegram && window.Telegram.WebApp) {
-        const webApp = window.Telegram.WebApp;
-        console.log("Telegram WebApp API обнаружен, версия:", webApp.version);
-        
-        // Проверяем поддержку нового метода полноэкранного режима
+        // Используем новый метод для активации полноэкранного режима
         if (typeof webApp.requestFullscreen === 'function') {
           webApp.requestFullscreen();
-          console.log("Запрошен полноэкранный режим на раннем этапе");
         } else {
+          // Фолбэк на старый метод
           webApp.expand();
-          console.log("Запрошен расширенный интерфейс на раннем этапе");
+        }
+        
+        // Установить цвет темы в соответствии с Telegram
+        if (webApp.colorScheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
         }
       }
+    }
+    
+    // Запрашиваем полноэкранный режим при загрузке скрипта
+    (function() {
+      enableFullscreen();
     })();
     
-    // Когда DOM загружен, настраиваем UI и события
+    // Настройка при загрузке DOM
     document.addEventListener('DOMContentLoaded', function() {
-      const fullscreenBtn = document.getElementById('fullscreenBtn');
-      const continueBtn = document.getElementById('continueBtn');
+      enableFullscreen();
       
+      // Настройка кнопок
+      document.getElementById('exploreBtn').addEventListener('click', function() {
+        window.location.href = 'index.html';
+      });
+      
+      document.getElementById('registerBtn').addEventListener('click', function() {
+        window.location.href = 'index.html#registration';
+      });
+      
+      // Установка обработчиков для категорий
+      const categoryItems = document.querySelectorAll('.category-item');
+      categoryItems.forEach(item => {
+        item.addEventListener('click', function() {
+          const categoryName = this.querySelector('.category-name').textContent;
+          // Здесь можно добавить переход на страницу категории
+          window.location.href = `index.html?category=${encodeURIComponent(categoryName)}`;
+        });
+      });
+      
+      // Настройка Telegram WebApp
       if (window.Telegram && window.Telegram.WebApp) {
         const webApp = window.Telegram.WebApp;
         
-        // Обновляем статус
-        updateStatus(`WebApp готов, платформа: ${webApp.platform}`);
-        
-        // Регистрируем обработчики событий
-        webApp.onEvent('viewportChanged', function() {
-          console.log("viewportChanged event, height:", webApp.viewportHeight);
-        });
-        
-        if (typeof webApp.onEvent === 'function') {
-          // События нового API для полноэкранного режима
-          webApp.onEvent('fullscreenChanged', function() {
-            const isFullscreen = webApp.isFullscreen;
-            console.log("fullscreenChanged event, isFullscreen:", isFullscreen);
-            updateStatus(isFullscreen ? "Полноэкранный режим активирован" : "Обычный режим");
-            fullscreenBtn.textContent = isFullscreen ? "Выйти из полноэкранного режима" : "Включить полноэкранный режим";
-          });
-          
-          webApp.onEvent('fullscreenFailed', function(error) {
-            console.error("fullscreenFailed event:", error);
-            updateStatus("Не удалось активировать полноэкранный режим");
+        // Настройка основной кнопки Telegram
+        if (webApp.MainButton) {
+          webApp.MainButton.setText('Начать');
+          webApp.MainButton.show();
+          webApp.MainButton.onClick(function() {
+            window.location.href = 'index.html';
           });
         }
         
-        // Настраиваем кнопки
-        fullscreenBtn.addEventListener('click', function() {
-          if (typeof webApp.requestFullscreen === 'function') {
-            if (webApp.isFullscreen) {
-              webApp.exitFullscreen();
-            } else {
-              webApp.requestFullscreen();
-            }
-          } else {
-            webApp.expand();
-            updateStatus("Запрошен расширенный режим (устаревший метод)");
-          }
-        });
-        
-        continueBtn.addEventListener('click', function() {
-          window.location.href = 'index.html';
-        });
-        
-        // Пробуем запросить полноэкранный режим после небольшой задержки
-        setTimeout(function() {
-          requestFullscreenMode();
-        }, 300);
-      } else {
-        updateStatus("Telegram WebApp API не обнаружен");
-        
-        // Делаем доступным переход даже если API не обнаружен
-        continueBtn.addEventListener('click', function() {
-          window.location.href = 'index.html';
-        });
+        // Обработка событий полноэкранного режима
+        if (typeof webApp.onEvent === 'function') {
+          webApp.onEvent('viewportChanged', function() {
+            enableFullscreen();
+          });
+          
+          // Повторный запрос на полноэкранный режим при изменении размера окна
+          webApp.onEvent('viewportChanged', enableFullscreen);
+        }
       }
     });
     
-    // После полной загрузки страницы - последняя попытка
+    // Запрос полноэкранного режима после полной загрузки страницы
     window.onload = function() {
-      console.log("Window loaded");
-      setTimeout(function() {
-        requestFullscreenMode();
-      }, 500);
+      setTimeout(enableFullscreen, 100);
     };
   </script>
 </body>
