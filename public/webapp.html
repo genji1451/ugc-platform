@@ -3,31 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Telegram WebApp</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>UGC WebApp</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+    
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      text-align: center;
       background-color: var(--tg-theme-bg-color, #ffffff);
       color: var(--tg-theme-text-color, #000000);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
     }
     
     .container {
       width: 100%;
       max-width: 500px;
       padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
     
     h1 {
       margin-bottom: 20px;
+      font-size: 24px;
     }
     
     .button {
@@ -40,6 +68,7 @@
       margin: 10px 0;
       cursor: pointer;
       width: 100%;
+      max-width: 300px;
     }
     
     .status {
@@ -47,65 +76,125 @@
       padding: 10px;
       background-color: rgba(0,0,0,0.05);
       border-radius: 8px;
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    .debug {
+      font-size: 12px;
+      margin-top: 30px;
+      padding: 10px;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.05);
+      max-width: 300px;
+      width: 100%;
+      text-align: left;
+      overflow: auto;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Telegram WebApp Demo</h1>
+    <h1>UGC Платформа</h1>
     <div class="status" id="status">Инициализация...</div>
     <button class="button" id="expandBtn">Развернуть на весь экран</button>
-    <button class="button" id="mainBtn">Открыть основной экран</button>
+    <button class="button" id="mainBtn">Перейти в приложение</button>
+    <div class="debug" id="debugInfo"></div>
   </div>
 
   <script>
+    function updateDebugInfo(info) {
+      const debugEl = document.getElementById('debugInfo');
+      debugEl.innerHTML += info + '<br>';
+    }
+    
+    // Принудительно вызываем функцию расширения сразу при загрузке скрипта
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.expand();
+      updateDebugInfo('Вызов expand() из глобальной области');
+    }
+    
     document.addEventListener('DOMContentLoaded', function() {
       const statusEl = document.getElementById('status');
       const expandBtn = document.getElementById('expandBtn');
       const mainBtn = document.getElementById('mainBtn');
       
+      updateDebugInfo('DOMContentLoaded сработал');
+      
       try {
         if (window.Telegram && window.Telegram.WebApp) {
           const webApp = window.Telegram.WebApp;
+          updateDebugInfo(`WebApp API доступен, платформа: ${webApp.platform}`);
           
-          statusEl.textContent = `WebApp инициализирован успешно! Платформа: ${webApp.platform}`;
+          // Устанавливаем обработчик события готовности WebApp
+          webApp.onEvent('viewportChanged', function() {
+            updateDebugInfo(`Событие viewportChanged, height=${webApp.viewportHeight}`);
+            webApp.expand();
+          });
           
-          // Автоматически развернуть на весь экран
+          // Принудительно расширяем WebApp на весь экран несколько раз с таймаутами
           webApp.expand();
+          updateDebugInfo('1й вызов expand()');
           
+          setTimeout(() => {
+            webApp.expand();
+            updateDebugInfo('2й вызов expand() через 300мс');
+          }, 300);
+          
+          setTimeout(() => {
+            webApp.expand();
+            updateDebugInfo('3й вызов expand() через 1000мс');
+            statusEl.textContent = `WebApp готов, высота: ${webApp.viewportHeight}px`;
+          }, 1000);
+          
+          // Настройка кнопок
           expandBtn.addEventListener('click', function() {
             webApp.expand();
-            statusEl.textContent = `Запрошен полноэкранный режим (viewportHeight: ${webApp.viewportHeight}px)`;
+            statusEl.textContent = `Запрошен полноэкранный режим`;
+            updateDebugInfo(`Клик по кнопке expand, height=${webApp.viewportHeight}`);
           });
           
           mainBtn.addEventListener('click', function() {
             window.location.href = 'index.html';
           });
           
-          // Включить главную кнопку Telegram
-          webApp.MainButton.setText('Продолжить');
-          webApp.MainButton.show();
-          webApp.MainButton.onClick(function() {
-            window.location.href = 'index.html';
-          });
+          // Настройка MainButton
+          if (webApp.MainButton) {
+            webApp.MainButton.setText('В приложение');
+            webApp.MainButton.onClick(function() {
+              window.location.href = 'index.html';
+            });
+            webApp.MainButton.show();
+            updateDebugInfo('MainButton настроена');
+          } else {
+            updateDebugInfo('MainButton недоступна');
+          }
           
-          // Логирование данных для отладки
-          console.log("WebApp платформа:", webApp.platform);
-          console.log("WebApp версия:", webApp.version);
-          console.log("WebApp цветовая схема:", webApp.colorScheme);
-          console.log("WebApp viewportHeight:", webApp.viewportHeight);
-          console.log("WebApp viewportStableHeight:", webApp.viewportStableHeight);
-          console.log("WebApp isExpanded:", webApp.isExpanded);
+          // Отладочная информация
+          updateDebugInfo(`Версия: ${webApp.version}`);
+          updateDebugInfo(`Цветовая схема: ${webApp.colorScheme}`);
+          updateDebugInfo(`ViewportHeight: ${webApp.viewportHeight}`);
+          updateDebugInfo(`isExpanded: ${webApp.isExpanded}`);
         } else {
-          statusEl.textContent = 'Telegram WebApp API не обнаружен!';
+          statusEl.textContent = 'Telegram WebApp API не найден';
           statusEl.style.backgroundColor = 'rgba(255,0,0,0.1)';
+          updateDebugInfo('WebApp API не обнаружен');
         }
       } catch (error) {
         statusEl.textContent = `Ошибка: ${error.message}`;
         statusEl.style.backgroundColor = 'rgba(255,0,0,0.1)';
-        console.error('Ошибка WebApp:', error);
+        updateDebugInfo(`Ошибка: ${error.message}`);
       }
     });
+    
+    // Дополнительная попытка расширения экрана после полной загрузки страницы
+    window.onload = function() {
+      updateDebugInfo('window.onload сработал');
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.expand();
+        updateDebugInfo('Вызов expand() из window.onload');
+      }
+    };
   </script>
 </body>
 </html> 

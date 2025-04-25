@@ -118,6 +118,12 @@ app.get('/webapp', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Маршрут для прямого запуска WebApp из Telegram
+app.get('/telegram-web-app', (req, res) => {
+  console.log('Прямой запуск WebApp из Telegram');
+  res.sendFile(path.join(__dirname, 'public', 'webapp.html'));
+});
+
 // Маршрут для WebApp с упрощенным именем - будет работать в Telegram
 app.get('/app', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'webapp.html'));
@@ -136,6 +142,13 @@ app.get('/main.html', (req, res) => {
 // Default route - serve index.html for onboarding
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Маршрут для запуска через startapp параметр
+app.get('/startapp/:appname', (req, res) => {
+  const { appname } = req.params;
+  console.log(`Запуск через startapp параметр: ${appname}`);
+  res.sendFile(path.join(__dirname, 'public', 'webapp.html'));
 });
 
 // Listen on the specified port
