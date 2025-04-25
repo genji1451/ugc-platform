@@ -2,7 +2,10 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>UGC Platform</title>
   <style>
     * {
@@ -16,6 +19,10 @@
       width: 100%;
       overflow-x: hidden;
       position: relative;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
     }
     
     body {
@@ -23,12 +30,16 @@
       background-color: #f5f5f5;
       color: #333;
       touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
     }
     
     .container {
       max-width: 100%;
       padding: 15px;
       margin: 0 auto;
+      padding-bottom: env(safe-area-inset-bottom, 15px);
+      padding-top: env(safe-area-inset-top, 15px);
     }
     
     header {
@@ -205,7 +216,7 @@
     
     .cart-button {
       position: fixed;
-      bottom: 20px;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0));
       right: 20px;
       background: #007bff;
       color: white;
@@ -216,7 +227,75 @@
       z-index: 100;
       -webkit-tap-highlight-color: transparent;
     }
+    
+    /* Стили для темного режима */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #232323;
+        color: #ffffff;
+      }
+      
+      .card {
+        background-color: #333;
+      }
+      
+      .item {
+        background-color: #333;
+      }
+      
+      .item-description {
+        color: #aaa;
+      }
+      
+      .tab {
+        color: #ddd;
+      }
+      
+      .category {
+        background-color: #444;
+        color: #eee;
+      }
+      
+      header {
+        border-bottom-color: #444;
+      }
+      
+      .tabs {
+        border-bottom-color: #444;
+      }
+    }
+    
+    [data-theme="dark"] {
+      background-color: #232323;
+      color: #ffffff;
+    }
+    
+    [data-theme="dark"] .card {
+      background-color: #333;
+    }
+    
+    [data-theme="dark"] .item {
+      background-color: #333;
+    }
+    
+    [data-theme="dark"] .item-description {
+      color: #aaa;
+    }
+    
+    [data-theme="dark"] .category {
+      background-color: #444;
+      color: #eee;
+    }
+    
+    [data-theme="dark"] header {
+      border-bottom-color: #444;
+    }
+    
+    [data-theme="dark"] .tabs {
+      border-bottom-color: #444;
+    }
   </style>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
   <div class="container">
@@ -364,6 +443,41 @@
   </div>
 
   <script>
+    // Инициализация Telegram WebApp
+    document.addEventListener('DOMContentLoaded', function() {
+      // Активно пытаемся получить Telegram WebApp API
+      const telegramWebApp = window.Telegram?.WebApp;
+      
+      if (telegramWebApp) {
+        console.log("Telegram WebApp найден, расширяю интерфейс");
+        
+        // Установить тему
+        if (telegramWebApp.colorScheme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+        
+        // Принудительно расширить на весь экран
+        telegramWebApp.expand();
+        
+        // Добавить обработчик событий готовности от Telegram
+        telegramWebApp.onEvent('viewportChanged', function() {
+          console.log("Viewport изменился, адаптируем размер");
+          // Дополнительная попытка расширить если размер изменился
+          telegramWebApp.expand();
+        });
+      } else {
+        console.log("Telegram WebApp не обнаружен, используем стандартный полноэкранный режим");
+        // Активация полноэкранного режима стандартными средствами мобильных браузеров
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+        } else if (document.documentElement.webkitRequestFullscreen) {
+          document.documentElement.webkitRequestFullscreen();
+        } else if (document.documentElement.msRequestFullscreen) {
+          document.documentElement.msRequestFullscreen();
+        }
+      }
+    });
+  
     // Tabs functionality
     const tabs = document.querySelectorAll('.tab');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -401,8 +515,9 @@
           cartCount++;
           document.getElementById('cart-count').textContent = cartCount;
           // Show success feedback for adding item
-          if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.showPopup({
+          const telegramWebApp = window.Telegram?.WebApp;
+          if (telegramWebApp) {
+            telegramWebApp.showPopup({
               title: 'Товар добавлен',
               message: 'Товар успешно добавлен в корзину',
               buttons: [{type: 'ok'}]
@@ -415,8 +530,9 @@
     });
     
     cartButton.addEventListener('click', () => {
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.showPopup({
+      const telegramWebApp = window.Telegram?.WebApp;
+      if (telegramWebApp) {
+        telegramWebApp.showPopup({
           title: 'Корзина',
           message: 'Здесь будет отображаться ваша корзина',
           buttons: [{type: 'ok'}]
@@ -442,16 +558,6 @@
         const avatarElement = document.querySelector('.avatar');
         if (avatarElement && user.name) {
           avatarElement.textContent = user.name.charAt(0).toUpperCase();
-        }
-      }
-      
-      // Expand Telegram WebApp to full screen if available
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.expand();
-        
-        // Set theme based on Telegram's theme
-        if (window.Telegram.WebApp.colorScheme === 'dark') {
-          document.documentElement.setAttribute('data-theme', 'dark');
         }
       }
     });
