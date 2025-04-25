@@ -102,9 +102,17 @@ app.post('/api/cart/clear', (req, res) => {
 });
 
 // Route for Telegram WebApp integration
-app.get('/tg/:botId', (req, res) => {
-  const { botId } = req.params;
-  // In a real app, you would validate botId and handle Telegram WebApp initialization
+app.get('/tg/:botId/:appName?', (req, res) => {
+  const { botId, appName } = req.params;
+  console.log(`WebApp accessed by bot: ${botId}, app: ${appName || 'default'}`);
+  // В реальном приложении здесь была бы проверка botId и appName
+  res.redirect('/');
+});
+
+// Direct route for t.me format links
+app.get('/t.me/:botId/:appName?', (req, res) => {
+  const { botId, appName } = req.params;
+  console.log(`t.me link accessed: bot=${botId}, app=${appName || 'default'}`);
   res.redirect('/');
 });
 
