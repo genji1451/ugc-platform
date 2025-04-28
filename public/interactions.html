@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Взаимодействия - UGC PRO</title>
+    <link rel="stylesheet" href="css/interactions.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="interactions-container">
+        <div class="interactions-header">
+            <h1>Взаимодействия</h1>
+            <div class="header-actions">
+                <button class="primary-button" id="export-data">
+                    Экспорт данных
+                </button>
+            </div>
+        </div>
+
+        <!-- Фильтры -->
+        <div class="filters">
+            <select id="status-filter">
+                <option value="all">Все статусы</option>
+                <option value="new">Новые</option>
+                <option value="in_progress">В работе</option>
+                <option value="completed">Завершенные</option>
+                <option value="cancelled">Отмененные</option>
+            </select>
+
+            <select id="type-filter">
+                <option value="all">Все типы</option>
+                <option value="order">Заказы</option>
+                <option value="collaboration">Коллаборации</option>
+                <option value="message">Сообщения</option>
+            </select>
+
+            <input type="date" id="date-from" placeholder="Дата от">
+            <input type="date" id="date-to" placeholder="Дата до">
+            
+            <input type="text" id="search" placeholder="Поиск...">
+        </div>
+
+        <!-- Статистика -->
+        <div class="statistics">
+            <div class="stat-card">
+                <div class="stat-value" id="total-interactions">0</div>
+                <div class="stat-label">Всего взаимодействий</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="active-interactions">0</div>
+                <div class="stat-label">Активных</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completed-interactions">0</div>
+                <div class="stat-label">Завершенных</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="conversion-rate">0%</div>
+                <div class="stat-label">Конверсия</div>
+            </div>
+        </div>
+
+        <!-- Таблица взаимодействий -->
+        <div class="table-container">
+            <table id="interactions-table">
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Тип</th>
+                        <th>Бренд</th>
+                        <th>Блогер</th>
+                        <th>Статус</th>
+                        <th>Бюджет</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="interactions-body">
+                    <!-- Данные будут добавляться динамически -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Модальное окно деталей -->
+        <div id="details-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Детали взаимодействия</h2>
+                    <button class="close-modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="label">ID:</span>
+                            <span class="value" id="detail-id"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Дата создания:</span>
+                            <span class="value" id="detail-date"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Тип:</span>
+                            <span class="value" id="detail-type"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Статус:</span>
+                            <span class="value" id="detail-status"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Бренд:</span>
+                            <span class="value" id="detail-brand"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Блогер:</span>
+                            <span class="value" id="detail-blogger"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Бюджет:</span>
+                            <span class="value" id="detail-budget"></span>
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3>История взаимодействий</h3>
+                        <div class="interaction-timeline" id="interaction-timeline">
+                            <!-- История будет добавляться динамически -->
+                        </div>
+                    </div>
+
+                    <div class="detail-section">
+                        <h3>Файлы и материалы</h3>
+                        <div class="files-grid" id="interaction-files">
+                            <!-- Файлы будут добавляться динамически -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="secondary-button" onclick="closeModal()">Закрыть</button>
+                    <button class="primary-button" onclick="updateStatus()">Обновить статус</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Функции для работы с данными
+        const interactionsData = {
+            get: () => JSON.parse(localStorage.getItem('interactions') || '[]'),
+            set: (data) => localStorage.setItem('interactions', JSON.stringify(data)),
+            add: (interaction) => {
+                const interactions = interactionsData.get();
+                interactions.push({
+                    id: Date.now(),
+                    createdAt: new Date().toISOString(),
+                    status: 'new',
+                    ...interaction
+                });
+                interactionsData.set(interactions);
+                updateStatistics();
+            },
+            update: (id, data) => {
+                const interactions = interactionsData.get();
+                const index = interactions.findIndex(i => i.id === id);
+                if (index !== -1) {
+                    interactions[index] = { ...interactions[index], ...data };
+                    interactionsData.set(interactions);
+                    updateStatistics();
+                }
+            }
+        };
+
+        // Обновление статистики
+        function updateStatistics() {
+            const interactions = interactionsData.get();
+            const active = interactions.filter(i => i.status === 'in_progress').length;
+            const completed = interactions.filter(i => i.status === 'completed').length;
+            const total = interactions.length;
+            const conversion = total ? Math.round((completed / total) * 100) : 0;
+
+            document.getElementById('total-interactions').textContent = total;
+            document.getElementById('active-interactions').textContent = active;
+            document.getElementById('completed-interactions').textContent = completed;
+            document.getElementById('conversion-rate').textContent = `${conversion}%`;
+        }
+
+        // Отображение взаимодействий
+        function renderInteractions() {
+            const interactions = interactionsData.get();
+            const tbody = document.getElementById('interactions-body');
+            const statusFilter = document.getElementById('status-filter').value;
+            const typeFilter = document.getElementById('type-filter').value;
+            const dateFrom = document.getElementById('date-from').value;
+            const dateTo = document.getElementById('date-to').value;
+            const search = document.getElementById('search').value.toLowerCase();
+
+            tbody.innerHTML = '';
+
+            interactions
+                .filter(interaction => {
+                    const matchesStatus = statusFilter === 'all' || interaction.status === statusFilter;
+                    const matchesType = typeFilter === 'all' || interaction.type === typeFilter;
+                    const matchesDate = (!dateFrom || interaction.createdAt >= dateFrom) &&
+                                      (!dateTo || interaction.createdAt <= dateTo);
+                    const matchesSearch = search === '' ||
+                                        interaction.brand.toLowerCase().includes(search) ||
+                                        interaction.blogger.toLowerCase().includes(search);
+                    
+                    return matchesStatus && matchesType && matchesDate && matchesSearch;
+                })
+                .forEach(interaction => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${new Date(interaction.createdAt).toLocaleDateString()}</td>
+                        <td>${interaction.type}</td>
+                        <td>${interaction.brand}</td>
+                        <td>${interaction.blogger}</td>
+                        <td><span class="status-badge ${interaction.status}">${interaction.status}</span></td>
+                        <td>₽${interaction.budget}</td>
+                        <td>
+                            <button class="icon-button" onclick="showDetails(${interaction.id})">
+                                <span class="material-icons">visibility</span>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+        }
+
+        // Показ деталей взаимодействия
+        function showDetails(id) {
+            const interaction = interactionsData.get().find(i => i.id === id);
+            if (!interaction) return;
+
+            document.getElementById('detail-id').textContent = interaction.id;
+            document.getElementById('detail-date').textContent = new Date(interaction.createdAt).toLocaleString();
+            document.getElementById('detail-type').textContent = interaction.type;
+            document.getElementById('detail-status').textContent = interaction.status;
+            document.getElementById('detail-brand').textContent = interaction.brand;
+            document.getElementById('detail-blogger').textContent = interaction.blogger;
+            document.getElementById('detail-budget').textContent = `₽${interaction.budget}`;
+
+            // Отображение истории
+            const timeline = document.getElementById('interaction-timeline');
+            timeline.innerHTML = interaction.history?.map(event => `
+                <div class="timeline-item">
+                    <div class="timeline-date">${new Date(event.date).toLocaleString()}</div>
+                    <div class="timeline-content">
+                        <strong>${event.type}</strong>
+                        <p>${event.description}</p>
+                    </div>
+                </div>
+            `).join('') || 'История пуста';
+
+            // Отображение файлов
+            const files = document.getElementById('interaction-files');
+            files.innerHTML = interaction.files?.map(file => `
+                <div class="file-item">
+                    <span class="material-icons">attachment</span>
+                    <span class="file-name">${file.name}</span>
+                    <button class="icon-button" onclick="downloadFile('${file.url}')">
+                        <span class="material-icons">download</span>
+                    </button>
+                </div>
+            `).join('') || 'Нет прикрепленных файлов';
+
+            document.getElementById('details-modal').style.display = 'flex';
+        }
+
+        // Закрытие модального окна
+        function closeModal() {
+            document.getElementById('details-modal').style.display = 'none';
+        }
+
+        // Обновление статуса
+        function updateStatus() {
+            // Здесь будет логика обновления статуса
+            closeModal();
+            renderInteractions();
+        }
+
+        // Экспорт данных
+        document.getElementById('export-data').addEventListener('click', function() {
+            const interactions = interactionsData.get();
+            const csv = [
+                ['ID', 'Дата', 'Тип', 'Бренд', 'Блогер', 'Статус', 'Бюджет'],
+                ...interactions.map(i => [
+                    i.id,
+                    new Date(i.createdAt).toLocaleString(),
+                    i.type,
+                    i.brand,
+                    i.blogger,
+                    i.status,
+                    i.budget
+                ])
+            ].map(row => row.join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `interactions_${new Date().toISOString()}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        });
+
+        // Обработчики фильтров
+        document.getElementById('status-filter').addEventListener('change', renderInteractions);
+        document.getElementById('type-filter').addEventListener('change', renderInteractions);
+        document.getElementById('date-from').addEventListener('change', renderInteractions);
+        document.getElementById('date-to').addEventListener('change', renderInteractions);
+        document.getElementById('search').addEventListener('input', renderInteractions);
+
+        // Закрытие модального окна при клике вне его
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('details-modal');
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Инициализация при загрузке
+        window.addEventListener('load', () => {
+            renderInteractions();
+            updateStatistics();
+            
+            if (window.Telegram?.WebApp) {
+                const webApp = window.Telegram.WebApp;
+                webApp.ready();
+                
+                if (webApp.colorScheme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

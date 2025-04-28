@@ -1,0 +1,347 @@
+/* Основной контейнер */
+.categories-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Шапка */
+.categories-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.categories-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: #333;
+}
+
+/* Поиск */
+.search-bar {
+    margin-bottom: 2rem;
+}
+
+.search-bar input {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+/* Сетка категорий */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+/* Карточка категории */
+.category-card {
+    background: #fff;
+    border-radius: 12px;
+    border: 2px solid;
+    padding: 1.5rem;
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.category-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 1rem;
+}
+
+.category-content h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    color: #333;
+}
+
+.category-content p {
+    margin: 0 0 1rem 0;
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.category-status {
+    margin-bottom: 1rem;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-badge.inactive {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.category-actions {
+    display: flex;
+    gap: 0.5rem;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+/* Кнопки */
+.primary-button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.primary-button:hover {
+    background: #0056b3;
+}
+
+.secondary-button {
+    background: #f8f9fa;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.secondary-button:hover {
+    background: #e9ecef;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    font-size: 1.2rem;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.icon-button:hover {
+    opacity: 1;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.form-group input[type="color"] {
+    width: 100%;
+    height: 40px;
+    padding: 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.modal-footer {
+    padding-top: 1.5rem;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* Темная тема */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #1a1a1a;
+        color: #fff;
+    }
+
+    .categories-header h1 {
+        color: #fff;
+    }
+
+    .category-card {
+        background: #2d2d2d;
+        border-color: #404040;
+    }
+
+    .category-content h3 {
+        color: #fff;
+    }
+
+    .category-content p {
+        color: #bbb;
+    }
+
+    .search-bar input {
+        background: #2d2d2d;
+        border-color: #404040;
+        color: #fff;
+    }
+
+    .modal-content {
+        background: #2d2d2d;
+    }
+
+    .modal-header {
+        border-bottom-color: #404040;
+    }
+
+    .modal-footer {
+        border-top-color: #404040;
+    }
+
+    .form-group label {
+        color: #fff;
+    }
+
+    .form-group input[type="text"],
+    .form-group textarea {
+        background: #1a1a1a;
+        border-color: #404040;
+        color: #fff;
+    }
+
+    .secondary-button {
+        background: #404040;
+        color: #fff;
+        border-color: #666;
+    }
+
+    .secondary-button:hover {
+        background: #4d4d4d;
+    }
+
+    .close-modal {
+        color: #fff;
+    }
+}
+
+/* Адаптивный дизайн */
+@media (max-width: 768px) {
+    .categories-container {
+        padding: 1rem;
+    }
+
+    .categories-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .categories-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .category-card {
+        padding: 1rem;
+    }
+
+    .modal-content {
+        margin: 1rem;
+        max-height: calc(100vh - 2rem);
+    }
+} 

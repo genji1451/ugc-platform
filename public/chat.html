@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат - UGC PRO</title>
+    <link rel="stylesheet" href="css/chat.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Список чатов -->
+        <div class="chats-list">
+            <div class="chats-header">
+                <h2>Сообщения</h2>
+                <input type="text" id="chat-search" placeholder="Поиск...">
+            </div>
+            <div class="chats-content" id="chats-container">
+                <!-- Чаты будут добавляться динамически -->
+            </div>
+        </div>
+
+        <!-- Область сообщений -->
+        <div class="messages-area">
+            <!-- Заголовок чата -->
+            <div class="chat-header" id="current-chat-header">
+                <div class="chat-info">
+                    <img src="assets/images/placeholder.png" alt="User" class="user-avatar">
+                    <div class="user-info">
+                        <h3>Выберите чат</h3>
+                        <span class="user-status">Нет активного чата</span>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button class="icon-button" id="view-profile">
+                        <span class="material-icons">info</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Область сообщений -->
+            <div class="messages-container" id="messages-container">
+                <div class="no-chat-selected">
+                    <img src="assets/images/chat-placeholder.png" alt="Select chat">
+                    <p>Выберите чат для начала общения</p>
+                </div>
+            </div>
+
+            <!-- Форма отправки сообщения -->
+            <div class="message-input-container">
+                <form id="message-form">
+                    <div class="message-attachments">
+                        <button type="button" class="attach-button">
+                            <span class="material-icons">attach_file</span>
+                        </button>
+                        <input type="file" id="file-input" multiple style="display: none">
+                    </div>
+                    <textarea 
+                        id="message-input" 
+                        placeholder="Введите сообщение..."
+                        rows="1"
+                    ></textarea>
+                    <button type="submit" class="send-button">
+                        <span class="material-icons">send</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Информация о пользователе (скрыта по умолчанию) -->
+        <div class="user-profile" id="user-profile">
+            <div class="profile-header">
+                <h3>Информация</h3>
+                <button class="close-profile">×</button>
+            </div>
+            <div class="profile-content">
+                <img src="assets/images/placeholder.png" alt="User" class="profile-avatar">
+                <h4 class="profile-name">Имя пользователя</h4>
+                <div class="profile-info">
+                    <div class="info-item">
+                        <span class="label">Роль:</span>
+                        <span class="value" id="profile-role">Блогер</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Категории:</span>
+                        <span class="value" id="profile-categories">Красота, Мода</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Подписчики:</span>
+                        <span class="value" id="profile-followers">25k+</span>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="primary-button" onclick="openTelegramChat()">
+                        Открыть в Telegram
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Функции для работы с localStorage
+        const chatData = {
+            get: () => JSON.parse(localStorage.getItem('chats') || '{}'),
+            set: (data) => localStorage.setItem('chats', JSON.stringify(data)),
+            addMessage: (chatId, message) => {
+                const chats = chatData.get();
+                if (!chats[chatId]) {
+                    chats[chatId] = {
+                        messages: [],
+                        lastMessage: null,
+                        unread: 0
+                    };
+                }
+                chats[chatId].messages.push({
+                    id: Date.now(),
+                    timestamp: new Date().toISOString(),
+                    ...message
+                });
+                chats[chatId].lastMessage = message.text;
+                chatData.set(chats);
+            }
+        };
+
+        // Функция для форматирования времени
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('ru-RU', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+
+        // Автоматическое изменение высоты текстового поля
+        const messageInput = document.getElementById('message-input');
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Отправка сообщения
+        document.getElementById('message-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                const currentChat = document.querySelector('.chat.active');
+                if (currentChat) {
+                    const chatId = currentChat.getAttribute('data-chat-id');
+                    chatData.addMessage(chatId, {
+                        text: message,
+                        sender: 'me',
+                        type: 'text'
+                    });
+                    renderMessages(chatId);
+                    input.value = '';
+                    input.style.height = 'auto';
+                }
+            }
+        });
+
+        // Отображение сообщений
+        function renderMessages(chatId) {
+            const container = document.getElementById('messages-container');
+            const chats = chatData.get();
+            const chat = chats[chatId];
+            
+            if (!chat) return;
+
+            container.innerHTML = '';
+            chat.messages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${message.sender === 'me' ? 'sent' : 'received'}`;
+                messageElement.innerHTML = `
+                    <div class="message-content">
+                        <p>${message.text}</p>
+                        <span class="message-time">${formatTime(message.timestamp)}</span>
+                    </div>
+                `;
+                container.appendChild(messageElement);
+            });
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Переключение между чатами
+        function switchChat(chatId) {
+            document.querySelectorAll('.chat').forEach(chat => {
+                chat.classList.remove('active');
+            });
+            const selectedChat = document.querySelector(`[data-chat-id="${chatId}"]`);
+            if (selectedChat) {
+                selectedChat.classList.add('active');
+                renderMessages(chatId);
+                updateChatHeader(chatId);
+            }
+        }
+
+        // Обновление заголовка чата
+        function updateChatHeader(chatId) {
+            const header = document.getElementById('current-chat-header');
+            const chat = document.querySelector(`[data-chat-id="${chatId}"]`);
+            
+            if (chat) {
+                const name = chat.querySelector('.chat-name').textContent;
+                const avatar = chat.querySelector('.chat-avatar').src;
+                
+                header.querySelector('.user-avatar').src = avatar;
+                header.querySelector('h3').textContent = name;
+                header.querySelector('.user-status').textContent = 'В сети';
+            }
+        }
+
+        // Открытие профиля пользователя
+        document.getElementById('view-profile').addEventListener('click', function() {
+            document.getElementById('user-profile').classList.toggle('active');
+        });
+
+        // Закрытие профиля пользователя
+        document.querySelector('.close-profile').addEventListener('click', function() {
+            document.getElementById('user-profile').classList.remove('active');
+        });
+
+        // Загрузка файлов
+        document.querySelector('.attach-button').addEventListener('click', function() {
+            document.getElementById('file-input').click();
+        });
+
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                // Здесь можно добавить логику загрузки файлов
+                console.log('Selected file:', file.name);
+            });
+        });
+
+        // Открытие чата в Telegram
+        function openTelegramChat() {
+            const currentChat = document.querySelector('.chat.active');
+            if (currentChat) {
+                const username = currentChat.getAttribute('data-telegram');
+                const message = encodeURIComponent('Здравствуйте! Пишу из UGC PRO.');
+                const telegramLink = `https://t.me/${username}?text=${message}`;
+                
+                if (window.Telegram?.WebApp) {
+                    window.Telegram.WebApp.openTelegramLink(telegramLink);
+                } else {
+                    window.open(telegramLink, '_blank');
+                }
+            }
+        }
+
+        // Инициализация при загрузке
+        window.addEventListener('load', () => {
+            if (window.Telegram?.WebApp) {
+                const webApp = window.Telegram.WebApp;
+                webApp.ready();
+                
+                if (webApp.colorScheme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

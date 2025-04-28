@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль - UGC PRO</title>
+    <link rel="stylesheet" href="css/profile.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="profile-container">
+        <h1>Профиль пользователя</h1>
+        <form id="profile-form">
+            <!-- Основная информация -->
+            <div class="form-group">
+                <label for="name">Имя</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nickname">Никнейм</label>
+                <input type="text" id="nickname" name="nickname">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Телефон</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+
+            <div class="form-group">
+                <label for="telegram">Telegram</label>
+                <input type="text" id="telegram" name="telegram">
+            </div>
+
+            <div class="form-group">
+                <label for="role">Роль</label>
+                <select id="role" name="role" required>
+                    <option value="blogger">Блогер</option>
+                    <option value="brand">Бренд</option>
+                </select>
+            </div>
+
+            <!-- Поля для блогера -->
+            <div class="role-specific blogger-fields">
+                <div class="form-group">
+                    <label for="categories">Категории</label>
+                    <input type="text" id="categories" name="categories" placeholder="Например: beauty, lifestyle">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">О себе</label>
+                    <textarea id="description" name="description"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="audience">Количество подписчиков</label>
+                    <input type="number" id="audience" name="audience">
+                </div>
+
+                <div class="form-group">
+                    <label for="reach">Средний охват</label>
+                    <input type="number" id="reach" name="reach">
+                </div>
+
+                <div class="form-group">
+                    <label for="portfolio">Портфолио (ссылки через запятую)</label>
+                    <input type="text" id="portfolio" name="portfolio">
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Стоимость размещения (₽)</label>
+                    <input type="number" id="price" name="price">
+                </div>
+            </div>
+
+            <!-- Поля для бренда -->
+            <div class="role-specific brand-fields">
+                <div class="form-group">
+                    <label for="company">Название компании</label>
+                    <input type="text" id="company" name="company">
+                </div>
+
+                <div class="form-group">
+                    <label for="contactPerson">Контактное лицо</label>
+                    <input type="text" id="contactPerson" name="contactPerson">
+                </div>
+
+                <div class="form-group">
+                    <label for="website">Сайт</label>
+                    <input type="url" id="website" name="website">
+                </div>
+            </div>
+
+            <!-- Загрузка изображений -->
+            <div class="form-group">
+                <label for="avatar">Фото профиля</label>
+                <input type="file" id="avatar" name="avatar" accept="image/*">
+                <img id="avatar-preview" class="avatar-preview" src="" alt="Preview" style="display: none;">
+            </div>
+
+            <div class="form-group brand-fields role-specific">
+                <label for="logo">Логотип компании</label>
+                <input type="file" id="logo" name="logo" accept="image/*">
+                <img id="logo-preview" class="avatar-preview" src="" alt="Preview" style="display: none;">
+            </div>
+
+            <button type="submit">Сохранить</button>
+        </form>
+    </div>
+
+    <script>
+        // Функция для работы с localStorage
+        const userData = {
+            get: () => JSON.parse(localStorage.getItem('userData') || '{}'),
+            set: (data) => localStorage.setItem('userData', JSON.stringify(data)),
+            update: (newData) => {
+                const currentData = userData.get();
+                userData.set({ ...currentData, ...newData });
+            }
+        };
+
+        // Обработка изменения роли
+        document.getElementById('role').addEventListener('change', function(e) {
+            const bloggerFields = document.querySelectorAll('.blogger-fields');
+            const brandFields = document.querySelectorAll('.brand-fields');
+            
+            if (e.target.value === 'blogger') {
+                bloggerFields.forEach(el => el.classList.add('active'));
+                brandFields.forEach(el => el.classList.remove('active'));
+            } else {
+                bloggerFields.forEach(el => el.classList.remove('active'));
+                brandFields.forEach(el => el.classList.add('active'));
+            }
+        });
+
+        // Предпросмотр изображений
+        function setupImagePreview(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        setupImagePreview('avatar', 'avatar-preview');
+        setupImagePreview('logo', 'logo-preview');
+
+        // Загрузка данных пользователя
+        window.addEventListener('load', function() {
+            const data = userData.get();
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    const element = document.getElementById(key);
+                    if (element) {
+                        if (element.type === 'file') {
+                            // Для файлов показываем превью, если есть
+                            const preview = document.getElementById(`${key}-preview`);
+                            if (preview && data[key]) {
+                                preview.src = data[key];
+                                preview.style.display = 'block';
+                            }
+                        } else {
+                            element.value = data[key];
+                        }
+                    }
+                });
+
+                // Активируем нужные поля в зависимости от роли
+                document.getElementById('role').dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Сохранение данных
+        document.getElementById('profile-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {};
+            
+            for (let [key, value] of formData.entries()) {
+                if (value instanceof File && value.size > 0) {
+                    // Конвертируем файлы в Data URL
+                    try {
+                        const dataUrl = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(reader.result);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(value);
+                        });
+                        data[key] = dataUrl;
+                    } catch (error) {
+                        console.error('Error converting file to Data URL:', error);
+                    }
+                } else {
+                    data[key] = value;
+                }
+            }
+
+            userData.update(data);
+            alert('Профиль успешно сохранен!');
+
+            // Если это Telegram WebApp
+            if (window.Telegram?.WebApp) {
+                window.Telegram.WebApp.MainButton.setText('Профиль сохранен').show();
+                setTimeout(() => {
+                    window.Telegram.WebApp.MainButton.hide();
+                }, 2000);
+            }
+        });
+
+        // Интеграция с Telegram WebApp
+        if (window.Telegram?.WebApp) {
+            const webApp = window.Telegram.WebApp;
+            webApp.ready();
+            
+            // Устанавливаем тему
+            if (webApp.colorScheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        }
+    </script>
+</body>
+</html>

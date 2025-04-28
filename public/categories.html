@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Категории - UGC PRO</title>
+    <link rel="stylesheet" href="/css/categories.css">
+</head>
+<body>
+    <div class="categories-container">
+        <header class="categories-header">
+            <h1>Категории</h1>
+            <button class="primary-button" onclick="openCreateModal()">Добавить категорию</button>
+        </header>
+
+        <div class="search-bar">
+            <input type="text" placeholder="Поиск по категориям..." oninput="filterCategories(this.value)">
+        </div>
+
+        <div class="categories-grid" id="categoriesGrid">
+            <!-- Категории будут добавлены через JavaScript -->
+        </div>
+
+        <!-- Модальное окно для создания/редактирования категории -->
+        <div class="modal" id="categoryModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="modalTitle">Новая категория</h2>
+                    <button class="close-modal" onclick="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="categoryForm" onsubmit="saveCategory(event)">
+                        <div class="form-group">
+                            <label for="categoryName">Название категории</label>
+                            <input type="text" id="categoryName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryDescription">Описание</label>
+                            <textarea id="categoryDescription" rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryIcon">Иконка</label>
+                            <input type="text" id="categoryIcon" placeholder="Например: 🎥">
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryColor">Цвет</label>
+                            <input type="color" id="categoryColor" value="#007bff">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="categoryActive" checked>
+                                Активная категория
+                            </label>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="secondary-button" onclick="closeModal()">Отмена</button>
+                            <button type="submit" class="primary-button">Сохранить</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Данные категорий
+        let categories = JSON.parse(localStorage.getItem('categories')) || [
+            {
+                id: 1,
+                name: 'Красота',
+                description: 'Косметика, уход за собой, бьюти-блогеры',
+                icon: '💄',
+                color: '#ff69b4',
+                active: true
+            },
+            {
+                id: 2,
+                name: 'Технологии',
+                description: 'Гаджеты, приложения, обзоры',
+                icon: '📱',
+                color: '#007bff',
+                active: true
+            },
+            {
+                id: 3,
+                name: 'Еда',
+                description: 'Рецепты, рестораны, кулинария',
+                icon: '🍳',
+                color: '#28a745',
+                active: true
+            },
+            {
+                id: 4,
+                name: 'Путешествия',
+                description: 'Туризм, отели, приключения',
+                icon: '✈️',
+                color: '#17a2b8',
+                active: true
+            }
+        ];
+
+        // Отображение категорий
+        function renderCategories(filterText = '') {
+            const grid = document.getElementById('categoriesGrid');
+            grid.innerHTML = '';
+
+            const filteredCategories = categories.filter(category =>
+                category.name.toLowerCase().includes(filterText.toLowerCase()) ||
+                category.description.toLowerCase().includes(filterText.toLowerCase())
+            );
+
+            filteredCategories.forEach(category => {
+                const card = document.createElement('div');
+                card.className = 'category-card';
+                card.style.borderColor = category.color;
+                
+                card.innerHTML = `
+                    <div class="category-icon" style="background-color: ${category.color}">
+                        ${category.icon}
+                    </div>
+                    <div class="category-content">
+                        <h3>${category.name}</h3>
+                        <p>${category.description}</p>
+                        <div class="category-status">
+                            <span class="status-badge ${category.active ? 'active' : 'inactive'}">
+                                ${category.active ? 'Активная' : 'Неактивная'}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="category-actions">
+                        <button class="icon-button" onclick="editCategory(${category.id})" title="Редактировать">
+                            ✏️
+                        </button>
+                        <button class="icon-button" onclick="deleteCategory(${category.id})" title="Удалить">
+                            🗑️
+                        </button>
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        // Фильтрация категорий
+        function filterCategories(text) {
+            renderCategories(text);
+        }
+
+        // Открытие модального окна
+        function openCreateModal() {
+            document.getElementById('modalTitle').textContent = 'Новая категория';
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryModal').style.display = 'flex';
+        }
+
+        // Закрытие модального окна
+        function closeModal() {
+            document.getElementById('categoryModal').style.display = 'none';
+        }
+
+        // Редактирование категории
+        function editCategory(id) {
+            const category = categories.find(c => c.id === id);
+            if (!category) return;
+
+            document.getElementById('modalTitle').textContent = 'Редактировать категорию';
+            document.getElementById('categoryName').value = category.name;
+            document.getElementById('categoryDescription').value = category.description;
+            document.getElementById('categoryIcon').value = category.icon;
+            document.getElementById('categoryColor').value = category.color;
+            document.getElementById('categoryActive').checked = category.active;
+
+            document.getElementById('categoryForm').dataset.editId = id;
+            document.getElementById('categoryModal').style.display = 'flex';
+        }
+
+        // Удаление категории
+        function deleteCategory(id) {
+            if (confirm('Вы уверены, что хотите удалить эту категорию?')) {
+                categories = categories.filter(c => c.id !== id);
+                localStorage.setItem('categories', JSON.stringify(categories));
+                renderCategories();
+            }
+        }
+
+        // Сохранение категории
+        function saveCategory(event) {
+            event.preventDefault();
+
+            const formData = {
+                name: document.getElementById('categoryName').value,
+                description: document.getElementById('categoryDescription').value,
+                icon: document.getElementById('categoryIcon').value,
+                color: document.getElementById('categoryColor').value,
+                active: document.getElementById('categoryActive').checked
+            };
+
+            const editId = document.getElementById('categoryForm').dataset.editId;
+
+            if (editId) {
+                // Редактирование существующей категории
+                const index = categories.findIndex(c => c.id === parseInt(editId));
+                if (index !== -1) {
+                    categories[index] = { ...categories[index], ...formData };
+                }
+            } else {
+                // Создание новой категории
+                const newId = Math.max(...categories.map(c => c.id), 0) + 1;
+                categories.push({ id: newId, ...formData });
+            }
+
+            localStorage.setItem('categories', JSON.stringify(categories));
+            renderCategories();
+            closeModal();
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories();
+        });
+
+        // Закрытие модального окна при клике вне его
+        window.onclick = function(event) {
+            const modal = document.getElementById('categoryModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html> 
