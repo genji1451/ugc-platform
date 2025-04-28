@@ -152,13 +152,13 @@
     
     .categories {
       display: flex;
-      flex-wrap: nowrap;
       gap: 10px;
       margin-bottom: 20px;
       overflow-x: auto;
-      padding-bottom: 5px;
+      padding: 10px 0;
       -webkit-overflow-scrolling: touch;
       scroll-behavior: smooth;
+      white-space: nowrap;
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
@@ -168,17 +168,25 @@
     }
     
     .category {
-      padding: 8px 16px;
-      background-color: #eee;
-      border-radius: 20px;
+      padding: 12px 24px;
+      background-color: #f5f5f5;
+      border-radius: 30px;
       cursor: pointer;
-      white-space: nowrap;
-      -webkit-tap-highlight-color: transparent;
+      transition: all 0.3s ease;
+      border: 1px solid #ddd;
+      font-weight: 500;
     }
     
     .category.active {
       background-color: #007bff;
       color: white;
+      border-color: #007bff;
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+    }
+    
+    .category:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     
     .grid {
@@ -354,34 +362,92 @@
       </div>
       
       <h2>Категории</h2>
-      <div class="categories-list">
-        <div class="category active">Все категории</div>
-        <div class="category">Одежда и аксессуары</div>
-        <div class="category">Красота и уход</div>
-        <div class="category">Электроника</div>
-        <div class="category">Дом и интерьер</div>
-        <div class="category">Спорт и отдых</div>
-        <div class="category">Еда и напитки</div>
-        <div class="category">Услуги</div>
+      <div class="categories" id="order-categories">
+        <div class="category active" data-category="all">Все категории</div>
+        <div class="category" data-category="fashion">Одежда и аксессуары</div>
+        <div class="category" data-category="beauty">Красота и уход</div>
+        <div class="category" data-category="electronics">Электроника</div>
+        <div class="category" data-category="home">Дом и интерьер</div>
+        <div class="category" data-category="sport">Спорт и отдых</div>
+        <div class="category" data-category="food">Еда и напитки</div>
+        <div class="category" data-category="services">Услуги</div>
       </div>
       
       <div class="grid" id="orders-list">
-        <div class="item">
-          <img src="https://via.placeholder.com/300x150?text=Product+1" alt="Product 1">
+        <!-- Одежда и аксессуары -->
+        <div class="item" data-category="fashion">
+          <img src="https://via.placeholder.com/300x150?text=Fashion" alt="Fashion">
           <div class="item-content">
-            <div class="item-title">Рекламная кампания спортивной одежды</div>
-            <div class="item-description">Требуется создание UGC контента для новой коллекции спортивной одежды</div>
-            <div class="item-price">Бюджет: 15000 ₽</div>
-            <button class="button contact-button" data-telegram="brand_sport">Связаться с заказчиком</button>
+            <div class="item-title">Рекламная кампания модного бренда</div>
+            <div class="item-description">Требуется создание стильных фото и видео для новой коллекции одежды</div>
+            <div class="item-price">Бюджет: 25000 ₽</div>
+            <button class="button contact-button" data-telegram="fashion_brand">Связаться с заказчиком</button>
           </div>
         </div>
-        <div class="item">
-          <img src="https://via.placeholder.com/300x150?text=Product+2" alt="Product 2">
+
+        <!-- Красота и уход -->
+        <div class="item" data-category="beauty">
+          <img src="https://via.placeholder.com/300x150?text=Beauty" alt="Beauty">
           <div class="item-content">
             <div class="item-title">Реклама косметического бренда</div>
             <div class="item-description">Нужны креативные видео с использованием нашей косметики</div>
             <div class="item-price">Бюджет: 20000 ₽</div>
             <button class="button contact-button" data-telegram="beauty_brand">Связаться с заказчиком</button>
+          </div>
+        </div>
+
+        <!-- Электроника -->
+        <div class="item" data-category="electronics">
+          <img src="https://via.placeholder.com/300x150?text=Electronics" alt="Electronics">
+          <div class="item-content">
+            <div class="item-title">Обзор новых наушников</div>
+            <div class="item-description">Требуется качественный обзор беспроводных наушников с акцентом на звук</div>
+            <div class="item-price">Бюджет: 15000 ₽</div>
+            <button class="button contact-button" data-telegram="tech_brand">Связаться с заказчиком</button>
+          </div>
+        </div>
+
+        <!-- Дом и интерьер -->
+        <div class="item" data-category="home">
+          <img src="https://via.placeholder.com/300x150?text=Home" alt="Home">
+          <div class="item-content">
+            <div class="item-title">Реклама декора для дома</div>
+            <div class="item-description">Ищем креативщиков для съемки роликов с нашими предметами интерьера</div>
+            <div class="item-price">Бюджет: 18000 ₽</div>
+            <button class="button contact-button" data-telegram="home_decor">Связаться с заказчиком</button>
+          </div>
+        </div>
+
+        <!-- Спорт и отдых -->
+        <div class="item" data-category="sport">
+          <img src="https://via.placeholder.com/300x150?text=Sport" alt="Sport">
+          <div class="item-content">
+            <div class="item-title">Реклама спортивного питания</div>
+            <div class="item-description">Нужны динамичные видео с использованием нашего спортивного питания</div>
+            <div class="item-price">Бюджет: 22000 ₽</div>
+            <button class="button contact-button" data-telegram="sport_nutrition">Связаться с заказчиком</button>
+          </div>
+        </div>
+
+        <!-- Еда и напитки -->
+        <div class="item" data-category="food">
+          <img src="https://via.placeholder.com/300x150?text=Food" alt="Food">
+          <div class="item-content">
+            <div class="item-title">Реклама здорового питания</div>
+            <div class="item-description">Ищем фуд-блогеров для создания аппетитных роликов</div>
+            <div class="item-price">Бюджет: 17000 ₽</div>
+            <button class="button contact-button" data-telegram="healthy_food">Связаться с заказчиком</button>
+          </div>
+        </div>
+
+        <!-- Услуги -->
+        <div class="item" data-category="services">
+          <img src="https://via.placeholder.com/300x150?text=Services" alt="Services">
+          <div class="item-content">
+            <div class="item-title">Реклама онлайн-курсов</div>
+            <div class="item-description">Требуется создание обзорных видео об образовательной платформе</div>
+            <div class="item-price">Бюджет: 30000 ₽</div>
+            <button class="button contact-button" data-telegram="edu_platform">Связаться с заказчиком</button>
           </div>
         </div>
       </div>
@@ -521,14 +587,25 @@
       });
     });
     
-    // Categories as a list
-    const categories = document.querySelectorAll('.category');
-    categories.forEach(category => {
+    // Фильтрация карточек по категориям
+    document.querySelectorAll('#order-categories .category').forEach(category => {
       category.addEventListener('click', () => {
-        const parentList = category.closest('.categories-list');
-        parentList.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
+        const selectedCategory = category.getAttribute('data-category');
+        
+        // Обновляем активную категорию
+        document.querySelectorAll('#order-categories .category').forEach(c => {
+          c.classList.remove('active');
+        });
         category.classList.add('active');
-        // Здесь будет логика фильтрации контента по категории
+        
+        // Фильтруем карточки
+        document.querySelectorAll('#orders-list .item').forEach(item => {
+          if (selectedCategory === 'all' || item.getAttribute('data-category') === selectedCategory) {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+          }
+        });
       });
     });
     
