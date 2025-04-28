@@ -339,65 +339,49 @@
     </header>
     
     <div class="tabs" id="tabs">
-      <div class="tab active" data-tab="marketplace">Маркетплейс</div>
+      <div class="tab active" data-tab="orders">Заказы</div>
       <div class="tab" data-tab="influencers">Инфлюенсеры</div>
-      <div class="tab" data-tab="projects">Мои проекты</div>
+      <div class="tab" data-tab="my-projects">Мои проекты</div>
       <div class="tab" data-tab="profile">Профиль</div>
     </div>
     
-    <div class="tab-content active" id="marketplace">
+    <div class="tab-content active" id="orders">
       <div class="card">
-        <div class="card-title">Добро пожаловать на UGC платформу!</div>
+        <div class="card-title">Доступные заказы на рекламу</div>
         <div class="card-content">
-          Здесь вы можете найти товары для создания контента или заказать UGC от инфлюенсеров.
+          Выберите заказ, который вы хотели бы прорекламировать. После выбора вы сможете связаться с заказчиком.
         </div>
       </div>
       
       <h2>Категории</h2>
-      <div class="categories" id="categories">
-        <div class="category active">Все</div>
+      <div class="categories-list">
+        <div class="category active">Все категории</div>
         <div class="category">Одежда и аксессуары</div>
         <div class="category">Красота и уход</div>
         <div class="category">Электроника</div>
         <div class="category">Дом и интерьер</div>
         <div class="category">Спорт и отдых</div>
+        <div class="category">Еда и напитки</div>
+        <div class="category">Услуги</div>
       </div>
       
-      <div class="grid" id="products">
+      <div class="grid" id="orders-list">
         <div class="item">
           <img src="https://via.placeholder.com/300x150?text=Product+1" alt="Product 1">
           <div class="item-content">
-            <div class="item-title">Футболка Oversize</div>
-            <div class="item-description">Стильная хлопковая футболка oversize</div>
-            <div class="item-price">1200 ₽</div>
-            <button class="button">Добавить в корзину</button>
+            <div class="item-title">Рекламная кампания спортивной одежды</div>
+            <div class="item-description">Требуется создание UGC контента для новой коллекции спортивной одежды</div>
+            <div class="item-price">Бюджет: 15000 ₽</div>
+            <button class="button contact-button" data-telegram="brand_sport">Связаться с заказчиком</button>
           </div>
         </div>
         <div class="item">
           <img src="https://via.placeholder.com/300x150?text=Product+2" alt="Product 2">
           <div class="item-content">
-            <div class="item-title">Набор косметики</div>
-            <div class="item-description">Подарочный набор для ухода за кожей</div>
-            <div class="item-price">По запросу</div>
-            <button class="button">Добавить в корзину</button>
-          </div>
-        </div>
-        <div class="item">
-          <img src="https://via.placeholder.com/300x150?text=Product+3" alt="Product 3">
-          <div class="item-content">
-            <div class="item-title">Беспроводные наушники</div>
-            <div class="item-description">Качественный звук и долгое время работы</div>
-            <div class="item-price">3500 ₽</div>
-            <button class="button">Добавить в корзину</button>
-          </div>
-        </div>
-        <div class="item">
-          <img src="https://via.placeholder.com/300x150?text=Product+4" alt="Product 4">
-          <div class="item-content">
-            <div class="item-title">Умный светильник</div>
-            <div class="item-description">Меняет цвет и яркость через приложение</div>
-            <div class="item-price">2100 ₽</div>
-            <button class="button">Добавить в корзину</button>
+            <div class="item-title">Реклама косметического бренда</div>
+            <div class="item-description">Нужны креативные видео с использованием нашей косметики</div>
+            <div class="item-price">Бюджет: 20000 ₽</div>
+            <button class="button contact-button" data-telegram="beauty_brand">Связаться с заказчиком</button>
           </div>
         </div>
       </div>
@@ -405,47 +389,38 @@
     
     <div class="tab-content" id="influencers">
       <h2>Инфлюенсеры</h2>
+      <div class="categories-list">
+        <div class="category active">Все направления</div>
+        <div class="category">Бьюти</div>
+        <div class="category">Лайфстайл</div>
+        <div class="category">Спорт</div>
+        <div class="category">Технологии</div>
+        <div class="category">Мода</div>
+        <div class="category">Еда</div>
+      </div>
       <div class="grid" id="influencers-list">
         <div class="item">
           <img src="https://via.placeholder.com/300x150?text=Influencer+1" alt="Influencer 1">
           <div class="item-content">
             <div class="item-title">Мария @beauty_maria</div>
             <div class="item-description">Бьюти-блогер, снимаю обзоры и гайды по макияжу. Охваты до 25k.</div>
-            <div class="item-price">от 5000 ₽</div>
-            <button class="button">Связаться</button>
+            <div class="item-price">Стоимость рекламы: от 5000 ₽</div>
+            <button class="button contact-button" data-telegram="beauty_maria">Связаться с блогером</button>
           </div>
         </div>
         <div class="item">
           <img src="https://via.placeholder.com/300x150?text=Influencer+2" alt="Influencer 2">
           <div class="item-content">
             <div class="item-title">Иван @tech_ivan</div>
-            <div class="item-description">Гаджеты, распаковки, лайфхаки. На связи с подписчиками.</div>
-            <div class="item-price">от 7000 ₽</div>
-            <button class="button">Связаться</button>
-          </div>
-        </div>
-        <div class="item">
-          <img src="https://via.placeholder.com/300x150?text=Influencer+3" alt="Influencer 3">
-          <div class="item-content">
-            <div class="item-title">Анна @anna_lifestyle</div>
-            <div class="item-description">Лайфстайл, уход за собой, обзоры косметики и одежды.</div>
-            <div class="item-price">от 4000 ₽</div>
-            <button class="button">Связаться</button>
-          </div>
-        </div>
-        <div class="item">
-          <img src="https://via.placeholder.com/300x150?text=Influencer+4" alt="Influencer 4">
-          <div class="item-content">
-            <div class="item-title">Сергей @sport_sergey</div>
-            <div class="item-description">Спорт, ЗОЖ, обзоры спортивного питания и экипировки.</div>
-            <div class="item-price">от 6000 ₽</div>
-            <button class="button">Связаться</button>
+            <div class="item-description">Гаджеты, распаковки, обзоры. Аудитория 50k+</div>
+            <div class="item-price">Стоимость рекламы: от 7000 ₽</div>
+            <button class="button contact-button" data-telegram="tech_ivan">Связаться с блогером</button>
           </div>
         </div>
       </div>
     </div>
     
-    <div class="tab-content" id="projects">
+    <div class="tab-content" id="my-projects">
       <h2>Мои проекты</h2>
       <div class="card">
         <div class="card-content">
@@ -466,10 +441,6 @@
         </div>
         <button class="button">Редактировать профиль</button>
       </div>
-    </div>
-    
-    <div class="cart-button" id="cart-button">
-      Корзина (<span id="cart-count">0</span>)
     </div>
   </div>
 
@@ -533,52 +504,32 @@
       });
     });
     
-    // Categories
-    const categories = document.querySelectorAll('.category');
-    
-    categories.forEach(category => {
-      category.addEventListener('click', () => {
-        categories.forEach(c => c.classList.remove('active'));
-        category.classList.add('active');
-        // Filter products logic would go here
+    // Обработка кнопок связи
+    document.querySelectorAll('.contact-button').forEach(button => {
+      button.addEventListener('click', () => {
+        const username = button.getAttribute('data-telegram');
+        const message = encodeURIComponent('Здравствуйте! Пишу из UGC PRO.');
+        const telegramLink = `https://t.me/${username}?start=${message}`;
+        
+        // Если это Telegram WebApp
+        const telegramWebApp = window.Telegram?.WebApp;
+        if (telegramWebApp) {
+          telegramWebApp.openTelegramLink(telegramLink);
+        } else {
+          window.open(telegramLink, '_blank');
+        }
       });
     });
     
-    // Cart functionality
-    const cartButton = document.getElementById('cart-button');
-    let cartCount = 0;
-    
-    document.querySelectorAll('.button').forEach(button => {
-      if (button.textContent === 'Добавить в корзину') {
-        button.addEventListener('click', () => {
-          cartCount++;
-          document.getElementById('cart-count').textContent = cartCount;
-          // Show success feedback for adding item
-          const telegramWebApp = window.Telegram?.WebApp;
-          if (telegramWebApp) {
-            telegramWebApp.showPopup({
-              title: 'Товар добавлен',
-              message: 'Товар успешно добавлен в корзину',
-              buttons: [{type: 'ok'}]
-            });
-          } else {
-            alert('Товар добавлен в корзину!');
-          }
-        });
-      }
-    });
-    
-    cartButton.addEventListener('click', () => {
-      const telegramWebApp = window.Telegram?.WebApp;
-      if (telegramWebApp) {
-        telegramWebApp.showPopup({
-          title: 'Корзина',
-          message: 'Здесь будет отображаться ваша корзина',
-          buttons: [{type: 'ok'}]
-        });
-      } else {
-        alert('Переход в корзину');
-      }
+    // Categories as a list
+    const categories = document.querySelectorAll('.category');
+    categories.forEach(category => {
+      category.addEventListener('click', () => {
+        const parentList = category.closest('.categories-list');
+        parentList.querySelectorAll('.category').forEach(c => c.classList.remove('active'));
+        category.classList.add('active');
+        // Здесь будет логика фильтрации контента по категории
+      });
     });
     
     // Populate profile data from registration if available
@@ -603,6 +554,15 @@
         const avatarElement = document.querySelector('.avatar');
         if (avatarElement && user.name) {
           avatarElement.textContent = user.name.charAt(0).toUpperCase();
+        }
+        
+        // Показываем соответствующий контент в зависимости от роли
+        if (user.role === 'blogger') {
+          document.querySelector('[data-tab="orders"]').textContent = 'Доступные заказы';
+          document.getElementById('orders').querySelector('.card-title').textContent = 'Доступные заказы на рекламу';
+        } else {
+          document.querySelector('[data-tab="orders"]').textContent = 'Мои товары';
+          document.getElementById('orders').querySelector('.card-title').textContent = 'Управление товарами';
         }
       }
     });
