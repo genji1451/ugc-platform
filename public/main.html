@@ -583,11 +583,17 @@
     
     // Populate profile data from registration if available
     window.addEventListener('load', () => {
-      // In a real app, you'd get this from localStorage, sessionStorage or from the server
-      // For demo purposes, we'll check if there's any data in localStorage
       const userData = localStorage.getItem('userData');
       if (userData) {
         const user = JSON.parse(userData);
+        
+        // Активируем все кнопки, если пользователь зарегистрирован
+        if (user.isRegistered) {
+          document.querySelectorAll('button').forEach(button => {
+            button.disabled = false;
+          });
+        }
+        
         document.getElementById('profile-name').textContent = user.name;
         document.getElementById('profile-email').textContent = user.email;
         document.getElementById('profile-phone').textContent = user.phone;

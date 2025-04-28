@@ -724,7 +724,7 @@
     
     // Register button
     registerBtn.addEventListener('click', () => {
-      // Скрываем клавиатуру перед проверкой данных, чтобы пользователь видел результат
+      // Скрываем клавиатуру перед проверкой данных
       if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
         document.activeElement.blur();
       }
@@ -749,39 +749,41 @@
       }
       
       // Save user data to localStorage
-      localStorage.setItem('userData', JSON.stringify({
+      const userData = {
         name,
         phone,
         email,
-        role: selectedRole
-      }));
+        role: selectedRole,
+        isRegistered: true
+      };
       
-      // Для Telegram WebApp нужно использовать специальный способ перехода
-      const telegramWebApp = window.Telegram?.WebApp;
-      if (telegramWebApp) {
-        // Сообщить Telegram о том, что произошла регистрация
-        if (telegramWebApp.MainButton) {
-          telegramWebApp.MainButton.setText('Перейти на главную');
-          telegramWebApp.MainButton.show();
-          telegramWebApp.MainButton.onClick(() => {
-            window.location.href = '/main.html';
+      localStorage.setItem('userData', JSON.stringify(userData));
+      
+      // Активируем все кнопки
+      document.querySelectorAll('button').forEach(button => {
+        button.disabled = false;
+      });
+      
+      // Сразу перенаправляем на главную страницу
+      window.location.href = '/main.html';
+    });
+    
+    // Проверяем при загрузке страницы, зарегистрирован ли пользователь
+    window.addEventListener('load', () => {
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        const user = JSON.parse(userData);
+        if (user.isRegistered) {
+          // Если пользователь уже зарегистрирован, активируем все кнопки
+          document.querySelectorAll('button').forEach(button => {
+            button.disabled = false;
           });
-        } else {
-          // Если кнопка не отображается, можно использовать popup
-          telegramWebApp.showPopup({
-            title: 'Успешная регистрация',
-            message: 'Вы успешно зарегистрировались! Переходим в приложение...',
-            buttons: [{
-              type: 'ok',
-              id: 'ok'
-            }]
-          }, function() {
+          
+          // Если мы на странице регистрации, перенаправляем на главную
+          if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
             window.location.href = '/main.html';
-          });
+          }
         }
-      } else {
-        // Обычный переход
-        window.location.href = '/main.html';
       }
     });
   </script>
