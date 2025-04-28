@@ -16,6 +16,18 @@
       "dest": "server.js"
     },
     {
+      "src": "/orders-content",
+      "dest": "server.js"
+    },
+    {
+      "src": "/categories-content",
+      "dest": "server.js"
+    },
+    {
+      "src": "/profile-content",
+      "dest": "server.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "server.js"
     }

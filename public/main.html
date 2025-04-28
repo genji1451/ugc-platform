@@ -8,6 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>UGC Platform</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="/css/orders.css">
+  <link rel="stylesheet" href="/css/profile.css">
+  <link rel="stylesheet" href="/css/categories.css">
   <style>
     * {
       margin: 0;
@@ -349,7 +352,7 @@
     <div class="tabs" id="tabs">
       <div class="tab active" data-tab="orders">Заказы</div>
       <div class="tab" data-tab="influencers">Инфлюенсеры</div>
-      <div class="tab" data-tab="my-projects">Мои проекты</div>
+      <div class="tab" data-tab="categories">Категории</div>
       <div class="tab" data-tab="profile">Профиль</div>
     </div>
     
@@ -546,14 +549,8 @@
       </div>
     </div>
     
-    <div class="tab-content" id="my-projects">
-      <h2>Мои проекты</h2>
-      <div class="card">
-        <div class="card-content">
-          У вас пока нет активных проектов. Создайте новый проект или разместите заказ.
-        </div>
-        <button class="button">Новый проект</button>
-      </div>
+    <div class="tab-content" id="categories">
+      <!-- Содержимое из categories.html будет загружено сюда -->
     </div>
     
     <div class="tab-content" id="profile">
@@ -724,6 +721,47 @@
           document.getElementById('orders').querySelector('.card-title').textContent = 'Управление товарами';
         }
       }
+    });
+    
+    // Загрузка контента вкладок
+    async function loadTabContent(tabId) {
+      const contentDiv = document.getElementById(tabId);
+      if (!contentDiv) return;
+      
+      try {
+        let response;
+        switch(tabId) {
+          case 'orders':
+            response = await fetch('/orders-content');
+            break;
+          case 'categories':
+            response = await fetch('/categories-content');
+            break;
+          case 'profile':
+            response = await fetch('/profile-content');
+            break;
+        }
+        
+        if (response && response.ok) {
+          const html = await response.text();
+          contentDiv.innerHTML = html;
+        }
+      } catch (error) {
+        console.error(`Error loading content for ${tabId}:`, error);
+      }
+    }
+    
+    // Загрузка контента при переключении вкладок
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabId = tab.getAttribute('data-tab');
+        loadTabContent(tabId);
+      });
+    });
+    
+    // Загрузка начального контента
+    document.addEventListener('DOMContentLoaded', () => {
+      loadTabContent('orders');
     });
   </script>
 </body>

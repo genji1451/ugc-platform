@@ -162,5 +162,18 @@ app.get('/fs', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'fullscreen.html'));
 });
 
+// Маршруты для загрузки контента вкладок
+app.get('/orders-content', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'orders.html'));
+});
+
+app.get('/categories-content', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'categories.html'));
+});
+
+app.get('/profile-content', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'profile.html'));
+});
+
 // Listen on the specified port
 app.listen(PORT, () => console.log(`🚀 UGC Platform running at http://localhost:${PORT}`));
