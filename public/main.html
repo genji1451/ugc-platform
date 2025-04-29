@@ -644,35 +644,8 @@
     </div>
     
     <div class="tab-content" id="profile">
-      <h2>Мой профиль</h2>
-      <div class="card profile-card">
-        <form id="profile-form" onsubmit="saveProfile(event)">
-          <div class="profile-header">
-            <div class="profile-avatar-large">
-              <span id="profile-avatar-text">A</span>
-            </div>
-          </div>
-          <div class="profile-form-group">
-            <label for="profile-name-input">Имя:</label>
-            <input type="text" id="profile-name-input" placeholder="Введите ваше имя" required>
-          </div>
-          <div class="profile-form-group">
-            <label for="profile-email-input">Email:</label>
-            <input type="email" id="profile-email-input" placeholder="example@mail.com" required>
-          </div>
-          <div class="profile-form-group">
-            <label for="profile-phone-input">Телефон:</label>
-            <input type="tel" id="profile-phone-input" placeholder="+7 (999) 999-99-99" required>
-          </div>
-          <div class="profile-form-group">
-            <label for="profile-role-input">Роль:</label>
-            <select id="profile-role-input" required>
-              <option value="blogger">Блогер</option>
-              <option value="client">Заказчик</option>
-            </select>
-          </div>
-          <button type="submit" class="profile-save-button">Сохранить изменения</button>
-        </form>
+      <div id="profile-content">
+        <!-- Контент будет загружен из profile.html -->
       </div>
     </div>
   </div>
@@ -821,96 +794,160 @@
       }
     });
     
-    // Обновленная функция загрузки контента вкладок
+    // Обновляем функцию загрузки контента вкладок
     async function loadTabContent(tabId) {
-      // Загружаем только для вкладок categories и profile
-      if (tabId !== 'categories' && tabId !== 'profile') return;
-      
-      const contentDiv = document.getElementById(tabId);
-      if (!contentDiv) return;
-      
-      try {
-        const response = await fetch(`/${tabId}-content`);
-        if (response.ok) {
-          const html = await response.text();
-          contentDiv.innerHTML = html;
+      if (tabId === 'profile') {
+        const contentDiv = document.getElementById('profile-content');
+        try {
+          const response = await fetch('/profile.html');
+          if (response.ok) {
+            const html = await response.text();
+            // Извлекаем содержимое body из загруженного HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const content = doc.querySelector('.profile-container');
+            if (content) {
+              contentDiv.innerHTML = content.outerHTML;
+              
+              // Загружаем стили для профиля
+              if (!document.querySelector('link[href="/css/profile.css"]')) {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = '/css/profile.css';
+                document.head.appendChild(link);
+              }
+              
+              // Инициализируем обработчики событий профиля
+              initializeProfileHandlers();
+            }
+          }
+        } catch (error) {
+          console.error('Error loading profile content:', error);
         }
-      } catch (error) {
-        console.error(`Error loading content for ${tabId}:`, error);
+      } else if (tabId === 'categories') {
+        const contentDiv = document.getElementById(tabId);
+        if (!contentDiv) return;
+        
+        try {
+          const response = await fetch(`/${tabId}-content`);
+          if (response.ok) {
+            const html = await response.text();
+            contentDiv.innerHTML = html;
+          }
+        } catch (error) {
+          console.error(`Error loading content for ${tabId}:`, error);
+        }
       }
     }
     
-    function saveProfile(event) {
-      event.preventDefault();
-      
-      // Получаем значения полей
-      const name = document.getElementById('profile-name-input').value.trim();
-      const email = document.getElementById('profile-email-input').value.trim();
-      const phone = document.getElementById('profile-phone-input').value.trim();
-      const role = document.getElementById('profile-role-input').value;
-      
-      // Проверяем заполнение полей
-      if (!name || !email || !phone || !role) {
-        alert('Пожалуйста, заполните все поля');
-        return;
-      }
-      
-      // Создаем объект с данными пользователя
-      const userData = {
-        name,
-        email,
-        phone,
-        role,
-        isRegistered: true
-      };
-      
-      try {
-        // Сохраняем в localStorage
-        localStorage.setItem('userData', JSON.stringify(userData));
-        
-        // Обновляем аватар
-        const avatarText = document.getElementById('profile-avatar-text');
-        if (avatarText) {
-          avatarText.textContent = name.charAt(0).toUpperCase();
-        }
-        
-        // Показываем уведомление об успешном сохранении
-        alert('Профиль успешно сохранен');
-        
-        // Обновляем страницу для применения изменений
-        window.location.reload();
-      } catch (error) {
-        alert('Произошла ошибка при сохранении профиля');
-        console.error('Error saving profile:', error);
-      }
-    }
-
-    // Обновляем функцию загрузки данных пользователя
-    function loadUserData() {
-      const userData = localStorage.getItem('userData');
-      if (userData) {
-        try {
-          const user = JSON.parse(userData);
+    // Функция инициализации обработчиков профиля
+    function initializeProfileHandlers() {
+      // Обработка изменения роли
+      const roleSelect = document.getElementById('role');
+      if (roleSelect) {
+        roleSelect.addEventListener('change', function(e) {
+          const bloggerFields = document.querySelectorAll('.blogger-fields');
+          const brandFields = document.querySelectorAll('.brand-fields');
           
-          // Заполняем поля формы
-          document.getElementById('profile-name-input').value = user.name || '';
-          document.getElementById('profile-email-input').value = user.email || '';
-          document.getElementById('profile-phone-input').value = user.phone || '';
-          document.getElementById('profile-role-input').value = user.role || 'client';
-          
-          // Обновляем аватар
-          const avatarText = document.getElementById('profile-avatar-text');
-          if (avatarText && user.name) {
-            avatarText.textContent = user.name.charAt(0).toUpperCase();
+          if (e.target.value === 'blogger') {
+            bloggerFields.forEach(el => el.classList.add('active'));
+            brandFields.forEach(el => el.classList.remove('active'));
+          } else {
+            bloggerFields.forEach(el => el.classList.remove('active'));
+            brandFields.forEach(el => el.classList.add('active'));
           }
-        } catch (error) {
-          console.error('Error loading user data:', error);
+        });
+      }
+      
+      // Предпросмотр изображений
+      function setupImagePreview(inputId, previewId) {
+        const input = document.getElementById(inputId);
+        const preview = document.getElementById(previewId);
+        if (input && preview) {
+          input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+              }
+              reader.readAsDataURL(file);
+            }
+          });
         }
       }
+      
+      setupImagePreview('avatar', 'avatar-preview');
+      setupImagePreview('logo', 'logo-preview');
+      
+      // Загрузка данных пользователя
+      const data = JSON.parse(localStorage.getItem('userData') || '{}');
+      if (data) {
+        Object.keys(data).forEach(key => {
+          const element = document.getElementById(key);
+          if (element) {
+            if (element.type === 'file') {
+              const preview = document.getElementById(`${key}-preview`);
+              if (preview && data[key]) {
+                preview.src = data[key];
+                preview.style.display = 'block';
+              }
+            } else {
+              element.value = data[key];
+            }
+          }
+        });
+        
+        // Активируем нужные поля в зависимости от роли
+        if (roleSelect) {
+          roleSelect.dispatchEvent(new Event('change'));
+        }
+      }
+      
+      // Обработка отправки формы
+      const profileForm = document.getElementById('profile-form');
+      if (profileForm) {
+        profileForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          
+          const formData = new FormData(this);
+          const data = {};
+          
+          for (let [key, value] of formData.entries()) {
+            if (value instanceof File && value.size > 0) {
+              try {
+                const dataUrl = await new Promise((resolve, reject) => {
+                  const reader = new FileReader();
+                  reader.onload = () => resolve(reader.result);
+                  reader.onerror = reject;
+                  reader.readAsDataURL(value);
+                });
+                data[key] = dataUrl;
+              } catch (error) {
+                console.error(`Error processing file ${key}:`, error);
+              }
+            } else {
+              data[key] = value;
+            }
+          }
+          
+          // Сохраняем данные
+          localStorage.setItem('userData', JSON.stringify(data));
+          
+          // Обновляем аватар в шапке
+          const avatarElement = document.querySelector('.avatar');
+          if (avatarElement && data.name) {
+            avatarElement.textContent = data.name.charAt(0).toUpperCase();
+          }
+          
+          alert('Профиль успешно сохранен');
+          
+          // Перезагружаем страницу для применения изменений
+          window.location.reload();
+        });
+      }
     }
-
-    // Вызываем загрузку данных при инициализации
-    document.addEventListener('DOMContentLoaded', loadUserData);
   </script>
 </body>
 </html> 
