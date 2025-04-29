@@ -723,26 +723,17 @@
       }
     });
     
-    // Загрузка контента вкладок
+    // Обновленная функция загрузки контента вкладок
     async function loadTabContent(tabId) {
+      // Загружаем только для вкладок categories и profile
+      if (tabId !== 'categories' && tabId !== 'profile') return;
+      
       const contentDiv = document.getElementById(tabId);
       if (!contentDiv) return;
       
       try {
-        let response;
-        switch(tabId) {
-          case 'orders':
-            response = await fetch('/orders-content');
-            break;
-          case 'categories':
-            response = await fetch('/categories-content');
-            break;
-          case 'profile':
-            response = await fetch('/profile-content');
-            break;
-        }
-        
-        if (response && response.ok) {
+        const response = await fetch(`/${tabId}-content`);
+        if (response.ok) {
           const html = await response.text();
           contentDiv.innerHTML = html;
         }
@@ -755,13 +746,15 @@
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
         const tabId = tab.getAttribute('data-tab');
+        
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        tab.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+        
         loadTabContent(tabId);
       });
-    });
-    
-    // Загрузка начального контента
-    document.addEventListener('DOMContentLoaded', () => {
-      loadTabContent('orders');
     });
   </script>
 </body>

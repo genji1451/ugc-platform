@@ -134,39 +134,16 @@ app.get('/tgwebapp', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'webapp.html'));
 });
 
-// Route for main.html
-app.get('/main.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'main.html'));
-});
-
-// Default route - serve index.html for onboarding
+// Основные маршруты
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Маршрут для запуска через startapp параметр
-app.get('/startapp/:appname', (req, res) => {
-  const { appname } = req.params;
-  console.log(`Запуск через startapp параметр: ${appname}`);
-  res.sendFile(path.join(__dirname, 'public', 'webapp.html'));
-});
-
-// Маршруты для полноэкранного режима
-app.get('/fullscreen', (req, res) => {
-  console.log('Запрошен полноэкранный режим');
-  res.sendFile(path.join(__dirname, 'public', 'fullscreen.html'));
-});
-
-app.get('/fs', (req, res) => {
-  console.log('Запрошен полноэкранный режим (краткий путь)');
-  res.sendFile(path.join(__dirname, 'public', 'fullscreen.html'));
+app.get('/main.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'main.html'));
 });
 
 // Маршруты для загрузки контента вкладок
-app.get('/orders-content', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'orders.html'));
-});
-
 app.get('/categories-content', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'categories.html'));
 });
