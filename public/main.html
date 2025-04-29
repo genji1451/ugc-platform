@@ -338,6 +338,96 @@
       background-color: #232323;
       border-bottom-color: #444;
     }
+
+    .profile-card {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .profile-header {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .profile-avatar-large {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background-color: #007bff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      color: white;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .profile-form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .profile-form-group input,
+    .profile-form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .profile-form-group input:focus,
+    .profile-form-group select:focus {
+      border-color: #007bff;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(0,123,255,0.1);
+    }
+
+    .profile-save-button {
+      width: 100%;
+      padding: 1rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 1rem;
+    }
+
+    .profile-save-button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Dark theme styles */
+    [data-theme="dark"] .profile-form-group label {
+      color: #fff;
+    }
+
+    [data-theme="dark"] .profile-form-group input,
+    [data-theme="dark"] .profile-form-group select {
+      background-color: #333;
+      border-color: #444;
+      color: #fff;
+    }
+
+    [data-theme="dark"] .profile-form-group input:focus,
+    [data-theme="dark"] .profile-form-group select:focus {
+      border-color: #50a8eb;
+      box-shadow: 0 0 0 2px rgba(80,168,235,0.1);
+    }
   </style>
 </head>
 <body>
@@ -555,28 +645,33 @@
     
     <div class="tab-content" id="profile">
       <h2>Мой профиль</h2>
-      <div class="card">
+      <div class="card profile-card">
         <form id="profile-form" onsubmit="saveProfile(event)">
-          <div class="form-group">
+          <div class="profile-header">
+            <div class="profile-avatar-large">
+              <span id="profile-avatar-text">A</span>
+            </div>
+          </div>
+          <div class="profile-form-group">
             <label for="profile-name-input">Имя:</label>
-            <input type="text" id="profile-name-input" required>
+            <input type="text" id="profile-name-input" placeholder="Введите ваше имя" required>
           </div>
-          <div class="form-group">
+          <div class="profile-form-group">
             <label for="profile-email-input">Email:</label>
-            <input type="email" id="profile-email-input" required>
+            <input type="email" id="profile-email-input" placeholder="example@mail.com" required>
           </div>
-          <div class="form-group">
+          <div class="profile-form-group">
             <label for="profile-phone-input">Телефон:</label>
-            <input type="tel" id="profile-phone-input" required>
+            <input type="tel" id="profile-phone-input" placeholder="+7 (999) 999-99-99" required>
           </div>
-          <div class="form-group">
+          <div class="profile-form-group">
             <label for="profile-role-input">Роль:</label>
             <select id="profile-role-input" required>
               <option value="blogger">Блогер</option>
               <option value="client">Заказчик</option>
             </select>
           </div>
-          <button type="submit" class="button">Сохранить</button>
+          <button type="submit" class="profile-save-button">Сохранить изменения</button>
         </form>
       </div>
     </div>
@@ -748,38 +843,74 @@
     function saveProfile(event) {
       event.preventDefault();
       
+      // Получаем значения полей
+      const name = document.getElementById('profile-name-input').value.trim();
+      const email = document.getElementById('profile-email-input').value.trim();
+      const phone = document.getElementById('profile-phone-input').value.trim();
+      const role = document.getElementById('profile-role-input').value;
+      
+      // Проверяем заполнение полей
+      if (!name || !email || !phone || !role) {
+        alert('Пожалуйста, заполните все поля');
+        return;
+      }
+      
+      // Создаем объект с данными пользователя
       const userData = {
-        name: document.getElementById('profile-name-input').value,
-        email: document.getElementById('profile-email-input').value,
-        phone: document.getElementById('profile-phone-input').value,
-        role: document.getElementById('profile-role-input').value,
+        name,
+        email,
+        phone,
+        role,
         isRegistered: true
       };
       
-      localStorage.setItem('userData', JSON.stringify(userData));
-      
-      // Update display values
-      document.getElementById('profile-name').textContent = userData.name;
-      document.getElementById('profile-email').textContent = userData.email;
-      document.getElementById('profile-phone').textContent = userData.phone;
-      document.getElementById('profile-role').textContent = userData.role === 'blogger' ? 'Блогер' : 'Заказчик';
-      
-      // Update avatar
-      const avatarElement = document.querySelector('.avatar');
-      if (avatarElement && userData.name) {
-        avatarElement.textContent = userData.name.charAt(0).toUpperCase();
+      try {
+        // Сохраняем в localStorage
+        localStorage.setItem('userData', JSON.stringify(userData));
+        
+        // Обновляем аватар
+        const avatarText = document.getElementById('profile-avatar-text');
+        if (avatarText) {
+          avatarText.textContent = name.charAt(0).toUpperCase();
+        }
+        
+        // Показываем уведомление об успешном сохранении
+        alert('Профиль успешно сохранен');
+        
+        // Обновляем страницу для применения изменений
+        window.location.reload();
+      } catch (error) {
+        alert('Произошла ошибка при сохранении профиля');
+        console.error('Error saving profile:', error);
       }
-      
-      // Blur active element to hide keyboard
-      document.activeElement.blur();
-      
-      // Show success message
-      alert('Профиль успешно сохранен');
-      
-      // Reload page to update UI with new role
-      location.reload();
     }
+
+    // Обновляем функцию загрузки данных пользователя
+    function loadUserData() {
+      const userData = localStorage.getItem('userData');
+      if (userData) {
+        try {
+          const user = JSON.parse(userData);
+          
+          // Заполняем поля формы
+          document.getElementById('profile-name-input').value = user.name || '';
+          document.getElementById('profile-email-input').value = user.email || '';
+          document.getElementById('profile-phone-input').value = user.phone || '';
+          document.getElementById('profile-role-input').value = user.role || 'client';
+          
+          // Обновляем аватар
+          const avatarText = document.getElementById('profile-avatar-text');
+          if (avatarText && user.name) {
+            avatarText.textContent = user.name.charAt(0).toUpperCase();
+          }
+        } catch (error) {
+          console.error('Error loading user data:', error);
+        }
+      }
+    }
+
+    // Вызываем загрузку данных при инициализации
+    document.addEventListener('DOMContentLoaded', loadUserData);
   </script>
 </body>
-</html> 
 </html> 
