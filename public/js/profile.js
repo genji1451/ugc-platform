@@ -394,4 +394,136 @@ function escapeHtml(str) {
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
-} 
+}
+
+// Функция для сохранения данных
+function handleSave() {
+    // Проверяем валидность формы
+    const form = document.getElementById('profile-form');
+    if (!form.checkValidity()) {
+        alert('Пожалуйста, заполните все обязательные поля');
+        return;
+    }
+
+    // Собираем все данные из формы
+    const formData = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        telegram: document.getElementById('telegram').value,
+        role: document.getElementById('role').value,
+        description: document.getElementById('description').value,
+        audience: document.getElementById('audience').value,
+        price: document.getElementById('price').value,
+        company: document.getElementById('company').value,
+        website: document.getElementById('website').value,
+        categories: Array.from(document.querySelectorAll('input[name="categories"]:checked'))
+            .map(checkbox => checkbox.value),
+        isRegistered: true
+    };
+
+    try {
+        // Сохраняем в localStorage
+        localStorage.setItem('userData', JSON.stringify(formData));
+        
+        // Показываем уведомление об успехе
+        alert('Профиль успешно сохранен!');
+        
+        // Если открыто в Telegram WebApp
+        if (window.Telegram?.WebApp) {
+            window.Telegram.WebApp.MainButton.setText('Профиль сохранен');
+            window.Telegram.WebApp.MainButton.show();
+            setTimeout(() => {
+                window.Telegram.WebApp.MainButton.hide();
+            }, 2000);
+        }
+        
+        // Перезагружаем страницу
+        window.location.reload();
+    } catch (error) {
+        console.error('Error saving data:', error);
+        alert('Произошла ошибка при сохранении профиля');
+    }
+}
+
+// Функция для загрузки данных
+function loadProfileData() {
+    try {
+        const savedData = localStorage.getItem('userData');
+        if (savedData) {
+            const data = JSON.parse(savedData);
+
+            // Заполняем все поля
+            document.getElementById('name').value = data.name || '';
+            document.getElementById('email').value = data.email || '';
+            document.getElementById('phone').value = data.phone || '';
+            document.getElementById('telegram').value = data.telegram || '';
+            document.getElementById('role').value = data.role || 'blogger';
+            document.getElementById('description').value = data.description || '';
+            document.getElementById('audience').value = data.audience || '';
+            document.getElementById('price').value = data.price || '';
+            document.getElementById('company').value = data.company || '';
+            document.getElementById('website').value = data.website || '';
+
+            // Отмечаем категории
+            if (data.categories && Array.isArray(data.categories)) {
+                document.querySelectorAll('input[name="categories"]').forEach(checkbox => {
+                    checkbox.checked = data.categories.includes(checkbox.value);
+                });
+            }
+
+            // Показываем/скрываем поля в зависимости от роли
+            toggleRoleFields(data.role);
+        }
+    } catch (error) {
+        console.error('Error loading data:', error);
+    }
+}
+
+// Функция переключения полей в зависимости от роли
+function toggleRoleFields(role) {
+    const bloggerFields = document.querySelector('.blogger-fields');
+    const brandFields = document.querySelector('.brand-fields');
+
+    if (role === 'blogger') {
+        bloggerFields.style.display = 'block';
+        brandFields.style.display = 'none';
+    } else {
+        bloggerFields.style.display = 'none';
+        brandFields.style.display = 'block';
+    }
+}
+
+// Обработчик изменения роли
+document.getElementById('role').addEventListener('change', function(e) {
+    toggleRoleFields(e.target.value);
+});
+
+// Загружаем данные при загрузке страницы
+window.addEventListener('load', function() {
+    loadProfileData();
+    
+    // Интеграция с Telegram WebApp
+    if (window.Telegram?.WebApp) {
+        const webApp = window.Telegram.WebApp;
+        webApp.ready();
+        
+        if (webApp.colorScheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    }
+});
+
+// Обработчики для сворачивания клавиатуры
+document.querySelectorAll('input, textarea, select').forEach(element => {
+    element.addEventListener('blur', function() {
+        window.scrollTo(0, 0);
+    });
+});
+
+// Сворачиваем клавиатуру при тапе вне полей ввода
+document.addEventListener('click', function(e) {
+    if (!e.target.matches('input, textarea, select, label')) {
+        document.activeElement.blur();
+    }
+}); 
