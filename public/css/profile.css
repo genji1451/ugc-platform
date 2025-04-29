@@ -403,4 +403,60 @@ body {
 .form-group textarea:active,
 .form-group select:active {
     transform: scale(0.995);
+}
+
+/* Стили для сетки категорий */
+.categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.category-item:hover {
+    border-color: var(--primary-color);
+}
+
+.category-item input[type="checkbox"] {
+    margin-right: 8px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+}
+
+.category-item span {
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+/* Стили для выбранных категорий */
+.category-item input[type="checkbox"]:checked + span {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.category-item:has(input[type="checkbox"]:checked) {
+    border-color: var(--primary-color);
+    background: rgba(0, 123, 255, 0.1);
+}
+
+/* Стили для полей в зависимости от роли */
+.role-specific {
+    display: none;
+    transition: all 0.3s ease;
+}
+
+.role-specific.active {
+    display: block;
 } 

@@ -6,6 +6,44 @@
     <title>Профиль - UGC PRO</title>
     <link rel="stylesheet" href="css/profile.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        .profile-container {
+            padding-bottom: 80px; /* Отступ для фиксированной кнопки */
+        }
+        
+        .fixed-button-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--tg-theme-bg-color, #fff);
+            padding: 15px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        
+        .save-button {
+            width: 100%;
+            padding: 12px;
+            background: var(--tg-theme-button-color, #007bff);
+            color: var(--tg-theme-button-text-color, #fff);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .save-button:active {
+            opacity: 0.8;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            font-size: 16px; /* Оптимальный размер для предотвращения зума на iOS */
+        }
+    </style>
 </head>
 <body>
     <div class="profile-container">
@@ -165,6 +203,11 @@
         </div>
     </div>
 
+    <!-- Фиксированная кнопка сохранения -->
+    <div class="fixed-button-container">
+        <button type="submit" form="profile-form" class="save-button">Сохранить</button>
+    </div>
+
     <script>
         // Функции для работы с данными профиля
         const profileData = {
@@ -283,6 +326,29 @@
                 if (webApp.colorScheme === 'dark') {
                     document.documentElement.setAttribute('data-theme', 'dark');
                 }
+            }
+        });
+
+        // Добавляем обработчики для сворачивания клавиатуры
+        document.querySelectorAll('input, textarea, select').forEach(element => {
+            // При фокусе прокручиваем к элементу
+            element.addEventListener('focus', function() {
+                setTimeout(() => {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            });
+            
+            // При потере фокуса сворачиваем клавиатуру
+            element.addEventListener('blur', function() {
+                element.blur();
+                window.scrollTo(0, 0);
+            });
+        });
+
+        // Добавляем обработчик для сворачивания клавиатуры по тапу вне полей ввода
+        document.addEventListener('click', function(e) {
+            if (!e.target.matches('input, textarea, select, label')) {
+                document.activeElement.blur();
             }
         });
     </script>
