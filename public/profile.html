@@ -47,160 +47,103 @@
 </head>
 <body>
     <div class="profile-container">
-        <div class="profile-header">
-            <h1>Профиль</h1>
-            <div class="header-actions">
-                <button class="primary-button" id="save-profile">
-                    Сохранить изменения
-                </button>
-            </div>
-        </div>
-
-        <div class="profile-content">
+        <h1>Профиль пользователя</h1>
+        <form id="profile-form">
             <!-- Основная информация -->
-            <div class="profile-section">
-                <h2>Основная информация</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="user-name">Имя</label>
-                        <input type="text" id="user-name" placeholder="Ваше имя">
-                    </div>
-                    <div class="form-group">
-                        <label for="user-email">Email</label>
-                        <input type="email" id="user-email" placeholder="your@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="user-phone">Телефон</label>
-                        <input type="tel" id="user-phone" placeholder="+7 (999) 999-99-99">
-                    </div>
-                    <div class="form-group">
-                        <label for="user-telegram">Telegram</label>
-                        <input type="text" id="user-telegram" placeholder="@username">
-                    </div>
+            <div class="form-group">
+                <label for="name">Имя</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Телефон</label>
+                <input type="tel" id="phone" name="phone">
+            </div>
+
+            <div class="form-group">
+                <label for="telegram">Telegram</label>
+                <input type="text" id="telegram" name="telegram">
+            </div>
+
+            <div class="form-group">
+                <label for="role">Роль</label>
+                <select id="role" name="role" required>
+                    <option value="blogger">Блогер</option>
+                    <option value="brand">Бренд</option>
+                </select>
+            </div>
+
+            <!-- Категории -->
+            <div class="form-group">
+                <label>Категории</label>
+                <div class="categories-grid">
+                    <label class="category-item">
+                        <input type="checkbox" name="categories" value="beauty">
+                        <span>Красота</span>
+                    </label>
+                    <label class="category-item">
+                        <input type="checkbox" name="categories" value="fashion">
+                        <span>Мода</span>
+                    </label>
+                    <label class="category-item">
+                        <input type="checkbox" name="categories" value="lifestyle">
+                        <span>Лайфстайл</span>
+                    </label>
+                    <label class="category-item">
+                        <input type="checkbox" name="categories" value="tech">
+                        <span>Технологии</span>
+                    </label>
+                    <label class="category-item">
+                        <input type="checkbox" name="categories" value="food">
+                        <span>Еда</span>
+                    </label>
+                    <label class="category-item">
+                        <input type="checkbox" name="categories" value="travel">
+                        <span>Путешествия</span>
+                    </label>
+                    <label class="category-item">
+                        <input type="checkbox" name="categories" value="sport">
+                        <span>Спорт</span>
+                    </label>
                 </div>
             </div>
 
-            <!-- Профессиональная информация -->
-            <div class="profile-section">
-                <h2>Профессиональная информация</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="user-role">Роль</label>
-                        <select id="user-role">
-                            <option value="blogger">Блогер</option>
-                            <option value="brand">Бренд</option>
-                            <option value="agency">Агентство</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="user-categories">Категории</label>
-                        <div class="categories-grid" id="categories-grid">
-                            <label class="category-item">
-                                <input type="checkbox" value="beauty">
-                                <span>Красота</span>
-                            </label>
-                            <label class="category-item">
-                                <input type="checkbox" value="fashion">
-                                <span>Мода</span>
-                            </label>
-                            <label class="category-item">
-                                <input type="checkbox" value="lifestyle">
-                                <span>Лайфстайл</span>
-                            </label>
-                            <label class="category-item">
-                                <input type="checkbox" value="tech">
-                                <span>Технологии</span>
-                            </label>
-                            <label class="category-item">
-                                <input type="checkbox" value="food">
-                                <span>Еда</span>
-                            </label>
-                            <label class="category-item">
-                                <input type="checkbox" value="travel">
-                                <span>Путешествия</span>
-                            </label>
-                            <label class="category-item">
-                                <input type="checkbox" value="sport">
-                                <span>Спорт</span>
-                            </label>
-                            <label class="category-item">
-                                <input type="checkbox" value="business">
-                                <span>Бизнес</span>
-                            </label>
-                        </div>
-                    </div>
+            <!-- Поля для блогера -->
+            <div class="role-specific blogger-fields">
+                <div class="form-group">
+                    <label for="description">О себе</label>
+                    <textarea id="description" name="description"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="audience">Количество подписчиков</label>
+                    <input type="number" id="audience" name="audience">
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Стоимость размещения (₽)</label>
+                    <input type="number" id="price" name="price">
                 </div>
             </div>
 
-            <!-- Социальные сети -->
-            <div class="profile-section">
-                <h2>Социальные сети</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="social-instagram">Instagram*</label>
-                        <input type="text" id="social-instagram" placeholder="@username">
-                    </div>
-                    <div class="form-group">
-                        <label for="social-tiktok">TikTok</label>
-                        <input type="text" id="social-tiktok" placeholder="@username">
-                    </div>
-                    <div class="form-group">
-                        <label for="social-youtube">YouTube</label>
-                        <input type="text" id="social-youtube" placeholder="channel_id">
-                    </div>
-                    <div class="form-group">
-                        <label for="social-vk">VK</label>
-                        <input type="text" id="social-vk" placeholder="username">
-                    </div>
+            <!-- Поля для бренда -->
+            <div class="role-specific brand-fields">
+                <div class="form-group">
+                    <label for="company">Название компании</label>
+                    <input type="text" id="company" name="company">
                 </div>
-            </div>
 
-            <!-- Статистика (для блогеров) -->
-            <div class="profile-section" id="blogger-stats">
-                <h2>Статистика</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="stats-followers">Подписчики</label>
-                        <input type="number" id="stats-followers" placeholder="Количество подписчиков">
-                    </div>
-                    <div class="form-group">
-                        <label for="stats-er">Engagement Rate</label>
-                        <input type="number" id="stats-er" placeholder="Средний ER" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label for="stats-audience">Аудитория</label>
-                        <textarea id="stats-audience" placeholder="Описание вашей аудитории"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="stats-price">Стоимость размещения</label>
-                        <input type="number" id="stats-price" placeholder="Стоимость в рублях">
-                    </div>
+                <div class="form-group">
+                    <label for="website">Сайт</label>
+                    <input type="url" id="website" name="website">
                 </div>
             </div>
-
-            <!-- Информация о компании (для брендов) -->
-            <div class="profile-section" id="brand-info">
-                <h2>Информация о компании</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="company-name">Название компании</label>
-                        <input type="text" id="company-name" placeholder="Название вашей компании">
-                    </div>
-                    <div class="form-group">
-                        <label for="company-website">Веб-сайт</label>
-                        <input type="url" id="company-website" placeholder="https://example.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="company-description">О компании</label>
-                        <textarea id="company-description" placeholder="Описание вашей компании"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="company-goals">Цели сотрудничества</label>
-                        <textarea id="company-goals" placeholder="Опишите ваши цели"></textarea>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </form>
     </div>
 
     <!-- Фиксированная кнопка сохранения -->
@@ -209,148 +152,97 @@
     </div>
 
     <script>
-        // Функции для работы с данными профиля
-        const profileData = {
-            get: () => JSON.parse(localStorage.getItem('profile') || '{}'),
-            set: (data) => localStorage.setItem('profile', JSON.stringify(data)),
-            update: (data) => {
-                const current = profileData.get();
-                profileData.set({ ...current, ...data });
+        // Функция для работы с localStorage
+        const userData = {
+            get: () => JSON.parse(localStorage.getItem('userData') || '{}'),
+            set: (data) => localStorage.setItem('userData', JSON.stringify(data)),
+            update: (newData) => {
+                const currentData = userData.get();
+                userData.set({ ...currentData, ...newData });
             }
         };
 
-        // Загрузка данных профиля
-        function loadProfile() {
-            const data = profileData.get();
+        // Обработка изменения роли
+        document.getElementById('role').addEventListener('change', function(e) {
+            const bloggerFields = document.querySelectorAll('.blogger-fields');
+            const brandFields = document.querySelectorAll('.brand-fields');
             
-            // Основная информация
-            document.getElementById('user-name').value = data.name || '';
-            document.getElementById('user-email').value = data.email || '';
-            document.getElementById('user-phone').value = data.phone || '';
-            document.getElementById('user-telegram').value = data.telegram || '';
-            
-            // Роль
-            document.getElementById('user-role').value = data.role || 'blogger';
-            
-            // Категории
-            const categories = data.categories || [];
-            document.querySelectorAll('#categories-grid input[type="checkbox"]').forEach(checkbox => {
-                checkbox.checked = categories.includes(checkbox.value);
-            });
-            
-            // Социальные сети
-            document.getElementById('social-instagram').value = data.social?.instagram || '';
-            document.getElementById('social-tiktok').value = data.social?.tiktok || '';
-            document.getElementById('social-youtube').value = data.social?.youtube || '';
-            document.getElementById('social-vk').value = data.social?.vk || '';
-            
-            // Статистика блогера
-            document.getElementById('stats-followers').value = data.stats?.followers || '';
-            document.getElementById('stats-er').value = data.stats?.er || '';
-            document.getElementById('stats-audience').value = data.stats?.audience || '';
-            document.getElementById('stats-price').value = data.stats?.price || '';
-            
-            // Информация о компании
-            document.getElementById('company-name').value = data.company?.name || '';
-            document.getElementById('company-website').value = data.company?.website || '';
-            document.getElementById('company-description').value = data.company?.description || '';
-            document.getElementById('company-goals').value = data.company?.goals || '';
-            
-            // Показ/скрытие секций в зависимости от роли
-            toggleSections(data.role);
-        }
-
-        // Переключение секций в зависимости от роли
-        function toggleSections(role) {
-            const bloggerStats = document.getElementById('blogger-stats');
-            const brandInfo = document.getElementById('brand-info');
-            
-            if (role === 'blogger') {
-                bloggerStats.style.display = 'block';
-                brandInfo.style.display = 'none';
-            } else if (role === 'brand' || role === 'agency') {
-                bloggerStats.style.display = 'none';
-                brandInfo.style.display = 'block';
+            if (e.target.value === 'blogger') {
+                bloggerFields.forEach(el => el.style.display = 'block');
+                brandFields.forEach(el => el.style.display = 'none');
+            } else {
+                bloggerFields.forEach(el => el.style.display = 'none');
+                brandFields.forEach(el => el.style.display = 'block');
             }
-        }
+        });
 
-        // Сохранение данных профиля
-        document.getElementById('save-profile').addEventListener('click', function() {
-            const data = {
-                name: document.getElementById('user-name').value,
-                email: document.getElementById('user-email').value,
-                phone: document.getElementById('user-phone').value,
-                telegram: document.getElementById('user-telegram').value,
-                role: document.getElementById('user-role').value,
-                categories: Array.from(document.querySelectorAll('#categories-grid input[type="checkbox"]:checked'))
-                    .map(checkbox => checkbox.value),
-                social: {
-                    instagram: document.getElementById('social-instagram').value,
-                    tiktok: document.getElementById('social-tiktok').value,
-                    youtube: document.getElementById('social-youtube').value,
-                    vk: document.getElementById('social-vk').value
-                },
-                stats: {
-                    followers: document.getElementById('stats-followers').value,
-                    er: document.getElementById('stats-er').value,
-                    audience: document.getElementById('stats-audience').value,
-                    price: document.getElementById('stats-price').value
-                },
-                company: {
-                    name: document.getElementById('company-name').value,
-                    website: document.getElementById('company-website').value,
-                    description: document.getElementById('company-description').value,
-                    goals: document.getElementById('company-goals').value
+        // Загрузка данных пользователя
+        window.addEventListener('load', function() {
+            const data = userData.get();
+            if (data) {
+                // Заполняем основные поля
+                ['name', 'email', 'phone', 'telegram', 'role', 'description', 
+                 'audience', 'price', 'company', 'website'].forEach(field => {
+                    const element = document.getElementById(field);
+                    if (element && data[field]) {
+                        element.value = data[field];
+                    }
+                });
+
+                // Заполняем категории
+                if (data.categories && Array.isArray(data.categories)) {
+                    data.categories.forEach(category => {
+                        const checkbox = document.querySelector(`input[name="categories"][value="${category}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                    });
                 }
-            };
+
+                // Активируем нужные поля в зависимости от роли
+                document.getElementById('role').dispatchEvent(new Event('change'));
+            }
+        });
+
+        // Сохранение данных
+        document.getElementById('profile-form').addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            profileData.set(data);
+            // Собираем данные формы
+            const formData = new FormData(this);
+            const data = {};
             
-            // Показываем уведомление об успешном сохранении
+            // Обрабатываем обычные поля
+            for (let [key, value] of formData.entries()) {
+                if (key !== 'categories') {
+                    data[key] = value;
+                }
+            }
+            
+            // Обрабатываем категории отдельно
+            data.categories = Array.from(document.querySelectorAll('input[name="categories"]:checked'))
+                .map(checkbox => checkbox.value);
+            
+            // Сохраняем данные
+            userData.set(data);
+            
+            // Показываем уведомление
             alert('Профиль успешно сохранен!');
-        });
-
-        // Обработчик изменения роли
-        document.getElementById('user-role').addEventListener('change', function(e) {
-            toggleSections(e.target.value);
-        });
-
-        // Инициализация при загрузке
-        window.addEventListener('load', () => {
-            loadProfile();
             
-            if (window.Telegram?.WebApp) {
-                const webApp = window.Telegram.WebApp;
-                webApp.ready();
-                
-                if (webApp.colorScheme === 'dark') {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                }
-            }
+            // Обновляем страницу
+            window.location.reload();
         });
 
-        // Добавляем обработчики для сворачивания клавиатуры
-        document.querySelectorAll('input, textarea, select').forEach(element => {
-            // При фокусе прокручиваем к элементу
-            element.addEventListener('focus', function() {
-                setTimeout(() => {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 300);
-            });
+        // Интеграция с Telegram WebApp
+        if (window.Telegram?.WebApp) {
+            const webApp = window.Telegram.WebApp;
+            webApp.ready();
             
-            // При потере фокуса сворачиваем клавиатуру
-            element.addEventListener('blur', function() {
-                element.blur();
-                window.scrollTo(0, 0);
-            });
-        });
-
-        // Добавляем обработчик для сворачивания клавиатуры по тапу вне полей ввода
-        document.addEventListener('click', function(e) {
-            if (!e.target.matches('input, textarea, select, label')) {
-                document.activeElement.blur();
+            // Устанавливаем тему
+            if (webApp.colorScheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
             }
-        });
+        }
     </script>
 </body>
 </html>
