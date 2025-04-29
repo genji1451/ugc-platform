@@ -556,13 +556,28 @@
     <div class="tab-content" id="profile">
       <h2>Мой профиль</h2>
       <div class="card">
-        <div class="card-content">
-          <p><strong>Имя:</strong> <span id="profile-name">Пользователь</span></p>
-          <p><strong>Email:</strong> <span id="profile-email">user@example.com</span></p>
-          <p><strong>Телефон:</strong> <span id="profile-phone">+7 (XXX) XXX-XX-XX</span></p>
-          <p><strong>Роль:</strong> <span id="profile-role">Заказчик</span></p>
-        </div>
-        <button class="button">Редактировать профиль</button>
+        <form id="profile-form" onsubmit="saveProfile(event)">
+          <div class="form-group">
+            <label for="profile-name-input">Имя:</label>
+            <input type="text" id="profile-name-input" required>
+          </div>
+          <div class="form-group">
+            <label for="profile-email-input">Email:</label>
+            <input type="email" id="profile-email-input" required>
+          </div>
+          <div class="form-group">
+            <label for="profile-phone-input">Телефон:</label>
+            <input type="tel" id="profile-phone-input" required>
+          </div>
+          <div class="form-group">
+            <label for="profile-role-input">Роль:</label>
+            <select id="profile-role-input" required>
+              <option value="blogger">Блогер</option>
+              <option value="client">Заказчик</option>
+            </select>
+          </div>
+          <button type="submit" class="button">Сохранить</button>
+        </form>
       </div>
     </div>
   </div>
@@ -573,13 +588,12 @@
       if (window.Telegram && window.Telegram.WebApp) {
         const webApp = window.Telegram.WebApp;
         
-        // Используем новый метод для активации полноэкранного режима
-        if (typeof webApp.requestFullscreen === 'function') {
-          webApp.requestFullscreen();
-        } else {
-          // Фолбэк на старый метод
-          webApp.expand();
-        }
+        // Устанавливаем параметры viewport
+        webApp.setViewportHeight(window.innerHeight);
+        webApp.expand();
+        
+        // Отключаем автоматическое сворачивание
+        webApp.enableClosingConfirmation();
         
         // Установить цвет темы в соответствии с Telegram
         if (webApp.colorScheme === 'dark') {
@@ -599,10 +613,19 @@
       
       // Обработка событий Telegram WebApp
       if (window.Telegram && window.Telegram.WebApp) {
-        // Обработчики событий для полноэкранного режима
-        if (typeof window.Telegram.WebApp.onEvent === 'function') {
-          window.Telegram.WebApp.onEvent('viewportChanged', enableFullscreen);
-        }
+        const webApp = window.Telegram.WebApp;
+        
+        // Предотвращаем автоматическое сворачивание при скролле
+        document.addEventListener('scroll', function(e) {
+          webApp.setViewportHeight(window.innerHeight);
+          webApp.expand();
+        }, { passive: true });
+        
+        // Обработчик изменения размера окна
+        window.addEventListener('resize', function() {
+          webApp.setViewportHeight(window.innerHeight);
+          webApp.expand();
+        }, { passive: true });
       }
     });
     
@@ -701,6 +724,11 @@
           });
         }
         
+        document.getElementById('profile-name-input').value = user.name || '';
+        document.getElementById('profile-email-input').value = user.email || '';
+        document.getElementById('profile-phone-input').value = user.phone || '';
+        document.getElementById('profile-role-input').value = user.role || 'client';
+        
         document.getElementById('profile-name').textContent = user.name;
         document.getElementById('profile-email').textContent = user.email;
         document.getElementById('profile-phone').textContent = user.phone;
@@ -756,6 +784,41 @@
         loadTabContent(tabId);
       });
     });
+    
+    function saveProfile(event) {
+      event.preventDefault();
+      
+      const userData = {
+        name: document.getElementById('profile-name-input').value,
+        email: document.getElementById('profile-email-input').value,
+        phone: document.getElementById('profile-phone-input').value,
+        role: document.getElementById('profile-role-input').value,
+        isRegistered: true
+      };
+      
+      localStorage.setItem('userData', JSON.stringify(userData));
+      
+      // Update display values
+      document.getElementById('profile-name').textContent = userData.name;
+      document.getElementById('profile-email').textContent = userData.email;
+      document.getElementById('profile-phone').textContent = userData.phone;
+      document.getElementById('profile-role').textContent = userData.role === 'blogger' ? 'Блогер' : 'Заказчик';
+      
+      // Update avatar
+      const avatarElement = document.querySelector('.avatar');
+      if (avatarElement && userData.name) {
+        avatarElement.textContent = userData.name.charAt(0).toUpperCase();
+      }
+      
+      // Blur active element to hide keyboard
+      document.activeElement.blur();
+      
+      // Show success message
+      alert('Профиль успешно сохранен');
+      
+      // Reload page to update UI with new role
+      location.reload();
+    }
   </script>
 </body>
 </html> 
