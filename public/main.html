@@ -203,6 +203,8 @@
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
     
     .item img {
@@ -428,6 +430,112 @@
       border-color: #50a8eb;
       box-shadow: 0 0 0 2px rgba(80,168,235,0.1);
     }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .modal-content {
+      position: relative;
+      background-color: #fff;
+      margin: 15px auto;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 12px;
+      overflow: hidden;
+      animation: modalOpen 0.3s ease;
+    }
+
+    @keyframes modalOpen {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .close-modal {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      font-size: 24px;
+      color: white;
+      cursor: pointer;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.5);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-header {
+      width: 100%;
+      height: 300px;
+      overflow: hidden;
+    }
+
+    #modal-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    #modal-title {
+      font-size: 24px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    #modal-description {
+      font-size: 16px;
+      line-height: 1.5;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    #modal-details {
+      margin-bottom: 20px;
+    }
+
+    .contact-button {
+      width: 100%;
+      padding: 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .contact-button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Обновите стили для карточек, добавив cursor: pointer */
+    .item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
   </style>
 </head>
 <body>
@@ -646,6 +754,21 @@
     <div class="tab-content" id="profile">
       <div id="profile-content">
         <!-- Контент будет загружен из profile.html -->
+      </div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <div class="modal-header">
+        <img id="modal-image" src="" alt="Product Image">
+      </div>
+      <div class="modal-body">
+        <h2 id="modal-title"></h2>
+        <p id="modal-description"></p>
+        <div id="modal-details"></div>
+        <button class="contact-button" onclick="contactSeller()">Связаться</button>
       </div>
     </div>
   </div>
@@ -947,6 +1070,63 @@
           window.location.reload();
         });
       }
+    }
+
+    const modal = document.getElementById('modal');
+    const closeModal = document.querySelector('.close-modal');
+
+    // Функция открытия модального окна
+    function openModal(item) {
+      const modalImage = document.getElementById('modal-image');
+      const modalTitle = document.getElementById('modal-title');
+      const modalDescription = document.getElementById('modal-description');
+      const modalDetails = document.getElementById('modal-details');
+
+      // Заполняем данные
+      modalImage.src = item.querySelector('img').src;
+      modalTitle.textContent = item.querySelector('.item-title').textContent;
+      modalDescription.textContent = item.querySelector('.item-description').textContent;
+      
+      // Добавляем дополнительные детали
+      const price = item.querySelector('.item-price');
+      if (price) {
+        modalDetails.innerHTML = `<p class="item-price">${price.textContent}</p>`;
+      }
+
+      // Показываем модальное окно
+      modal.style.display = 'block';
+      document.body.style.overflow = 'hidden'; // Запрещаем прокрутку основного контента
+    }
+
+    // Добавляем обработчики событий для всех карточек
+    document.querySelectorAll('.item').forEach(item => {
+      item.addEventListener('click', () => openModal(item));
+    });
+
+    // Закрытие модального окна
+    closeModal.addEventListener('click', () => {
+      modal.style.display = 'none';
+      document.body.style.overflow = ''; // Возвращаем прокрутку
+    });
+
+    // Закрытие по клику вне модального окна
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Функция для связи с продавцом
+    function contactSeller() {
+      // Здесь можно добавить логику для связи (например, открытие чата или отправка сообщения)
+      const sellerData = {
+        name: document.getElementById('modal-title').textContent,
+        // Добавьте другие необходимые данные
+      };
+      
+      // Пример перехода в чат
+      window.location.href = `chat.html?seller=${encodeURIComponent(JSON.stringify(sellerData))}`;
     }
   </script>
 </body>
