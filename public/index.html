@@ -246,9 +246,27 @@
 </head>
 <body>
   <script>
-    let tg = window.Telegram.WebApp;
-    tg.expand();
-    tg.enableClosingConfirmation();
+    // Функция для активации полноэкранного режима
+    function enableFullscreen() {
+      if (window.Telegram && window.Telegram.WebApp) {
+        const webApp = window.Telegram.WebApp;
+        
+        // Используем метод для активации полноэкранного режима
+        if (typeof webApp.requestFullscreen === 'function') {
+          webApp.requestFullscreen();
+        }
+      }
+    }
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+      let tg = window.Telegram.WebApp;
+      tg.expand();
+      tg.enableClosingConfirmation();
+      
+      // Вызываем функцию для активации полноэкранного режима
+      enableFullscreen();
+    });
   </script>
   <div class="onboarding">
       <div class="onboarding-text">
