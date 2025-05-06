@@ -11,7 +11,7 @@
   <style>
     @font-face {
       font-family: 'CustomFont';
-      src: url('assets/fonts/Montserrat-Medium.ttf') format('ttf');
+      src: url('assets/fonts/Montserrat-Medium.ttf') format('truetype');
       font-weight: normal;
       font-style: normal;
       font-display: swap;
@@ -33,53 +33,118 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
     
-    .onboarding {
+    /* Общие стили для слайдов */
+    .slide {
+      display: none;
       width: 100%;
       height: 100%;
-      position: relative;
-      background-image: url('assets/images/onboarding/onboarding-bg-1.png');
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-image: url('assets/images/onboarding/onboarding-bg-2.png');
       background-size: cover;
       background-position: center;
+      z-index: 5;
     }
     
-    .start-button {
+    .slide.active {
+      display: block;
+    }
+    
+    /* Первый слайд (онбординг) */
+    #slide0 {
+      background-image: url('assets/images/onboarding/onboarding-bg-1.png');
+      z-index: 1;
+    }
+    
+    /* Стили для содержимого слайдов */
+    .slide-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 85%;
+      max-width: 450px;
+      text-align: center;
+      color: white;
+      padding: 30px;
+      border-radius: 20px;
+      background-color: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
+    }
+    
+    .slide-content h1 {
+      font-size: 26px;
+      margin-bottom: 15px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+    
+    .slide-content p {
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 5px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    }
+    
+    .slide-content .emoji {
+      font-size: 50px;
+      margin-bottom: 15px;
+    }
+    
+    /* Навигационные кнопки */
+    .nav-buttons {
       position: fixed;
       bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 15px 40px;
-      background-color: #007bff;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      z-index: 30;
+    }
+    
+    .back-button, .next-button {
+      padding: 12px 30px;
+      background-color: rgba(0, 123, 255, 0.9);
       color: white;
       border: none;
       border-radius: 30px;
       font-size: 16px;
       cursor: pointer;
-      min-width: 200px;
-      text-align: center;
-      z-index: 10;
     }
     
-    .start-button:active {
-      background-color: #0056b3;
+    .back-button {
+      background-color: rgba(255, 255, 255, 0.3);
     }
     
-    .registration {
-      display: none;
+    /* Индикаторы слайдов */
+    .slide-indicators {
       position: fixed;
-      top: 0;
+      bottom: 20px;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url('assets/images/onboarding/onboarding-bg-2.png');
-      background-size: cover;
-      background-position: center;
-      z-index: 20;
-      overflow-y: auto;
-      padding: 20px;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      z-index: 30;
     }
     
-    .registration.active {
-      display: block;
+    .indicator {
+      width: 8px;
+      height: 8px;
+      background-color: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+    }
+    
+    .indicator.active {
+      background-color: white;
+      width: 10px;
+      height: 10px;
+    }
+    
+    /* Стили формы регистрации */
+    #registration-slide {
+      z-index: 10;
     }
     
     .registration-form {
@@ -206,13 +271,12 @@
     .error-message.visible {
       display: block;
     }
-
+    
     .onboarding-text {
-      font-family: 'CustomFont', sans-serif;
       position: absolute;
       bottom: 120px;
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translateX(-50%);
       text-align: center;
       color: white;
       width: 90%;
@@ -231,8 +295,9 @@
       line-height: 1.5;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
     }
-
-    #slide1::before {
+    
+    /* Затемнение для первого слайда */
+    #slide0::before {
       content: '';
       position: absolute;
       top: 0;
@@ -268,16 +333,80 @@
       enableFullscreen();
     });
   </script>
-  <div class="onboarding">
-      <div class="onboarding-text">
-        <h1>UGC PRO</h1>
-        <p>Платформа,соединяющая креативных создателей контента и бренды для успешного
-          сотрудничества.</p>
-      </div>
-    <button class="start-button" onclick="showRegistration()">Начать</button>
+  
+  <!-- Первый слайд (Интро) -->
+  <div id="slide0" class="slide active">
+    <div class="onboarding-text">
+      <h1>UGC PRO</h1>
+      <p>Платформа, соединяющая креативных создателей контента и бренды для успешного сотрудничества.</p>
+    </div>
+    <div class="nav-buttons">
+      <button class="next-button" onclick="nextSlide()">Начать</button>
+    </div>
   </div>
-
-  <div class="registration" id="registration">
+  
+  <!-- Второй слайд (Что такое UGC) -->
+  <div id="slide1" class="slide">
+    <div class="slide-content">
+      <div class="emoji">📱</div>
+      <h1>Что такое UGC?</h1>
+      <p>UGC или User-Generated Content — это контент, созданный пользователями для брендов. Естественные, аутентичные материалы, которые вызывают больше доверия у аудитории.</p>
+    </div>
+    <div class="nav-buttons">
+      <button class="back-button" onclick="prevSlide()">Назад</button>
+      <button class="next-button" onclick="nextSlide()">Далее</button>
+    </div>
+    <div class="slide-indicators">
+      <div class="indicator"></div>
+      <div class="indicator active"></div>
+      <div class="indicator"></div>
+      <div class="indicator"></div>
+      <div class="indicator"></div>
+    </div>
+  </div>
+  
+  <!-- Третий слайд (Для блогеров) -->
+  <div id="slide2" class="slide">
+    <div class="slide-content">
+      <div class="emoji">🎬</div>
+      <h1>Для блогеров</h1>
+      <p>Создавайте качественный контент для брендов, расширяйте портфолио и зарабатывайте на своём творчестве</p>
+    </div>
+    <div class="nav-buttons">
+      <button class="back-button" onclick="prevSlide()">Назад</button>
+      <button class="next-button" onclick="nextSlide()">Далее</button>
+    </div>
+    <div class="slide-indicators">
+      <div class="indicator"></div>
+      <div class="indicator"></div>
+      <div class="indicator active"></div>
+      <div class="indicator"></div>
+      <div class="indicator"></div>
+    </div>
+  </div>
+  
+  <!-- Четвертый слайд (Для брендов) -->
+  <div id="slide3" class="slide">
+    <div class="slide-content">
+      <div class="emoji">💼</div>
+      <h1>Для брендов</h1>
+      <p>Получите доступ к талантливым создателям контента, которые помогут представить ваш продукт в лучшем свете</p>
+    </div>
+    <div class="nav-buttons">
+      <button class="back-button" onclick="prevSlide()">Назад</button>
+      <button class="next-button" onclick="nextSlide()">Далее</button>
+    </div>
+    <div class="slide-indicators">
+      <div class="indicator"></div>
+      <div class="indicator"></div>
+      <div class="indicator"></div>
+      <div class="indicator active"></div>
+      <div class="indicator"></div>
+    </div>
+  </div>
+  
+  <!-- Пятый слайд (Регистрация) -->
+  <div id="slide4" class="slide" id="registration-slide">
     <div class="registration-form">
       <div class="emoji">👋</div>
       <h1>Добро пожаловать!</h1>
@@ -315,15 +444,66 @@
         Зарегистрироваться
       </button>
     </div>
+    <div class="slide-indicators">
+      <div class="indicator"></div>
+      <div class="indicator"></div>
+      <div class="indicator"></div>
+      <div class="indicator"></div>
+      <div class="indicator active"></div>
+    </div>
   </div>
 
   <script>
+    let currentSlide = 0;
     let selectedRole = null;
-
-    function showRegistration() {
-      document.getElementById('registration').classList.add('active');
+    const totalSlides = 5;
+    
+    // Функция для переключения на следующий слайд
+    function nextSlide() {
+      // Скрываем текущий слайд
+      document.getElementById(`slide${currentSlide}`).classList.remove('active');
+      
+      // Переключаемся на следующий слайд
+      currentSlide = (currentSlide + 1) % totalSlides;
+      
+      // Показываем новый слайд
+      document.getElementById(`slide${currentSlide}`).classList.add('active');
+      
+      // Обновляем индикаторы слайдов
+      updateIndicators();
     }
-
+    
+    // Функция для переключения на предыдущий слайд
+    function prevSlide() {
+      // Скрываем текущий слайд
+      document.getElementById(`slide${currentSlide}`).classList.remove('active');
+      
+      // Переключаемся на предыдущий слайд
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      
+      // Показываем новый слайд
+      document.getElementById(`slide${currentSlide}`).classList.add('active');
+      
+      // Обновляем индикаторы слайдов
+      updateIndicators();
+    }
+    
+    // Функция для обновления индикаторов слайдов
+    function updateIndicators() {
+      const indicators = document.querySelectorAll('.slide-indicators');
+      indicators.forEach(indicatorSet => {
+        const dots = indicatorSet.querySelectorAll('.indicator');
+        dots.forEach((dot, index) => {
+          if (index === currentSlide) {
+            dot.classList.add('active');
+          } else {
+            dot.classList.remove('active');
+          }
+        });
+      });
+    }
+    
+    // Функция выбора роли
     function selectRole(role) {
       selectedRole = role;
       document.querySelectorAll('.role-button').forEach(btn => {
@@ -339,6 +519,7 @@
       validateForm();
     }
 
+    // Валидация формы
     function validateForm() {
       const name = document.getElementById('name').value.trim();
       const phone = document.getElementById('phone').value.trim();
@@ -392,6 +573,7 @@
       }
     });
 
+    // Регистрация
     function register() {
       if (selectedRole && !document.getElementById('registerButton').disabled) {
         const userData = {
@@ -408,6 +590,11 @@
         window.location.href = `main.html?role=${selectedRole}`;
       }
     }
+    
+    // Инициализация индикаторов при загрузке
+    document.addEventListener('DOMContentLoaded', function() {
+      updateIndicators();
+    });
   </script>
 </body>
 </html>
