@@ -2,13 +2,21 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>UGC - Onboarding</title>
+  <title>UGC Platform</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
+    @font-face {
+      font-family: 'CustomFont';
+      src: url('assets/fonts/Montserrat-Medium.ttf') format('ttf');
+      font-weight: normal;
+      font-style: normal;
+      font-display: swap;
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -198,9 +206,63 @@
     .error-message.visible {
       display: block;
     }
+
+    .onboarding-text {
+      font-family: 'CustomFont', sans-serif;
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: white;
+      width: 90%;
+      max-width: 600px;
+      z-index: 2;
+    }
+
+    .onboarding-text h1 {
+      font-size: 32px;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .onboarding-text p {
+      font-size: 18px;
+      line-height: 1.5;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    #slide1::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.1));
+      z-index: 1;
+    }
   </style>
 </head>
 <body>
+  <script>
+    let tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.enableClosingConfirmation();
+  </script>
+  <div class="container">
+    <div id="slide1" class="slide active">
+      <div class="onboarding-text">
+        <h1>Ваш заголовок</h1>
+        <p>Ваш текст описания</p>
+      </div>
+      <div class="button-container">
+        <button onclick="nextSlide()">Начать</button>
+      </div>
+    </div>
+    <!-- Остальной код... -->
+  </div>
+
   <div class="onboarding">
     <button class="start-button" onclick="showRegistration()">Начать</button>
   </div>
