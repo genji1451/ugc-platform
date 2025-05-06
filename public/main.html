@@ -1235,152 +1235,98 @@
       }
     }
 
-    const modal = document.getElementById('modal');
-    const closeModal = document.querySelector('.close-modal');
-
-    // Функция открытия модального окна
-    function openModal(item) {
-      const modalImage = document.getElementById('modal-image');
-      const modalTitle = document.getElementById('modal-title');
-      const modalDescription = document.getElementById('modal-description');
-      const modalDetails = document.getElementById('modal-details');
-
-      // Заполняем данные
-      modalImage.src = item.querySelector('img').src;
-      modalTitle.textContent = item.querySelector('.item-title').textContent;
-      modalDescription.textContent = item.querySelector('.item-description').textContent;
-      
-      // Добавляем дополнительные детали
-      const price = item.querySelector('.item-price');
-      if (price) {
-        modalDetails.innerHTML = `<p class="item-price">${price.textContent}</p>`;
-      }
-
-      // Показываем модальное окно
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden'; // Запрещаем прокрутку основного контента
-      
-      // Применяем цвета Telegram WebApp если доступны
-      if (window.Telegram && window.Telegram.WebApp) {
-        const theme = window.Telegram.WebApp.themeParams;
-        document.documentElement.style.setProperty('--tg-theme-bg-color', theme.bg_color || '#ffffff');
-        document.documentElement.style.setProperty('--tg-theme-text-color', theme.text_color || '#000000');
-        document.documentElement.style.setProperty('--tg-theme-hint-color', theme.hint_color || '#999999');
-        document.documentElement.style.setProperty('--tg-theme-link-color', theme.link_color || '#2481cc');
-        document.documentElement.style.setProperty('--tg-theme-button-color', theme.button_color || '#2481cc');
-        document.documentElement.style.setProperty('--tg-theme-button-text-color', theme.button_text_color || '#ffffff');
-      }
-    }
-
-    // Добавляем обработчики событий для всех карточек
-    document.querySelectorAll('.item').forEach(item => {
-      item.addEventListener('click', () => openModal(item));
-    });
-
-    // Закрытие модального окна
-    closeModal.addEventListener('click', () => {
-      modal.style.display = 'none';
-      document.body.style.overflow = ''; // Возвращаем прокрутку
-    });
-
-    // Закрытие по клику вне модального окна
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
-      }
-    });
-
-    // Функция для связи с продавцом
-    function contactSeller() {
-      // Здесь можно добавить логику для связи (например, открытие чата или отправка сообщения)
-      const sellerData = {
-        name: document.getElementById('modal-title').textContent,
-        // Добавьте другие необходимые данные
-      };
-      
-      // Пример перехода в чат
-      window.location.href = `chat.html?seller=${encodeURIComponent(JSON.stringify(sellerData))}`;
-    }
-
+    // Удаляем все старые обработчики для карточек
     document.addEventListener('DOMContentLoaded', function() {
-      // Элементы модального окна
-      const modal = document.getElementById('productModal');
-      const closeBtn = document.querySelector('.modal-close');
-      const productImage = document.getElementById('modal-product-image');
-      const productTitle = document.getElementById('modal-product-title');
-      const productDesc = document.getElementById('modal-product-description');
-      const productPrice = document.getElementById('modal-product-price');
-      const contactBtn = document.getElementById('modal-contact-btn');
+      console.log('Initializing card handlers...');
       
-      // Функция для открытия модального окна
-      function openModal(item) {
-        // Заполняем данные
-        productImage.src = item.querySelector('img').src;
-        productTitle.textContent = item.querySelector('.item-title').textContent;
-        productDesc.textContent = item.querySelector('.item-description').textContent;
-        
-        const price = item.querySelector('.item-price');
-        if (price) {
-          productPrice.textContent = price.textContent;
-        } else {
-          productPrice.textContent = '';
-        }
-        
-        // Настраиваем кнопку связи
-        const originalContactBtn = item.querySelector('.contact-button');
-        if (originalContactBtn) {
-          const telegramUsername = originalContactBtn.getAttribute('data-telegram');
-          contactBtn.onclick = function() {
-            if (telegramUsername) {
-              window.open(`https://t.me/${telegramUsername}?text=Здравствуйте! Я заинтересован в сотрудничестве.`, '_blank');
-            }
-            modal.style.display = 'none';
-            document.body.style.overflow = '';
-          };
-        }
-        
-        // Показываем модальное окно
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+      // Переменные для нового модального окна
+      const productModal = document.getElementById('productModal');
+      
+      // Если старое модальное окно существует, скрываем его
+      const oldModal = document.getElementById('modal');
+      if (oldModal) {
+        oldModal.style.display = 'none';
+        console.log('Old modal hidden');
       }
       
-      // Закрытие модального окна
-      closeBtn.addEventListener('click', function() {
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
-      });
-      
-      // Закрытие при клике вне окна
-      modal.addEventListener('click', function(e) {
-        if (e.target === modal) {
-          modal.style.display = 'none';
-          document.body.style.overflow = '';
-        }
-      });
-      
-      // Добавляем обработчики на все карточки
+      // Проверяем наличие карточек и добавляем обработчики
       setTimeout(function() {
-        console.log('Adding click handlers to cards...');
         const cards = document.querySelectorAll('.item');
         console.log('Found cards:', cards.length);
         
+        // Удаляем все существующие обработчики кликов с карточек
         cards.forEach(function(card) {
-          // Добавляем стили для указания кликабельности
+          const clone = card.cloneNode(true);
+          card.parentNode.replaceChild(clone, card);
+        });
+        
+        // Получаем обновленный список карточек
+        const newCards = document.querySelectorAll('.item');
+        
+        // Добавляем новые обработчики
+        newCards.forEach(function(card) {
           card.style.cursor = 'pointer';
           
-          // Добавляем обработчик для открытия модального окна
           card.addEventListener('click', function(e) {
-            // Не открываем модальное окно при клике на кнопку
+            // Игнорируем клики на кнопки
             if (e.target.closest('.button') || e.target.closest('.contact-button')) {
               return;
             }
-            openModal(this);
+            
+            // Получаем данные
+            const img = card.querySelector('img');
+            const title = card.querySelector('.item-title');
+            const desc = card.querySelector('.item-description');
+            const price = card.querySelector('.item-price');
+            
+            // Заполняем модальное окно
+            document.getElementById('modal-product-image').src = img ? img.src : '';
+            document.getElementById('modal-product-title').textContent = title ? title.textContent : '';
+            document.getElementById('modal-product-description').textContent = desc ? desc.textContent : '';
+            document.getElementById('modal-product-price').textContent = price ? price.textContent : '';
+            
+            // Настраиваем кнопку
+            const contactBtn = document.getElementById('modal-contact-btn');
+            const originalBtn = card.querySelector('.contact-button');
+            
+            if (contactBtn && originalBtn) {
+              const telegramUsername = originalBtn.getAttribute('data-telegram');
+              contactBtn.onclick = function() {
+                if (telegramUsername) {
+                  window.open(`https://t.me/${telegramUsername}?text=Здравствуйте! Я заинтересован в сотрудничестве.`, '_blank');
+                }
+                productModal.style.display = 'none';
+                document.body.style.overflow = '';
+              };
+            }
+            
+            // Показываем модальное окно
+            productModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            console.log('Modal opened for:', title ? title.textContent : 'unknown item');
           });
-          
-          console.log('Handler added to card:', card.querySelector('.item-title')?.textContent);
         });
+        
+        console.log('Card handlers initialized');
       }, 500);
+      
+      // Настраиваем закрытие модального окна
+      const closeBtn = document.querySelector('.modal-close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+          productModal.style.display = 'none';
+          document.body.style.overflow = '';
+        });
+      }
+      
+      // Закрытие по клику вне окна
+      productModal.addEventListener('click', function(e) {
+        if (e.target === productModal) {
+          productModal.style.display = 'none';
+          document.body.style.overflow = '';
+        }
+      });
     });
   </script>
 </body>
