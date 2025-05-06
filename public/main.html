@@ -440,27 +440,33 @@
       height: 100%;
       background-color: rgba(0, 0, 0, 0.7);
       z-index: 1000;
-      overflow-y: auto;
+      overflow: hidden;
+      display: none;
+      align-items: center;
+      justify-content: center;
     }
 
     .modal-content {
       position: relative;
-      background-color: #fff;
-      margin: 15px auto;
+      background-color: var(--tg-theme-bg-color, #ffffff);
+      color: var(--tg-theme-text-color, #000000);
+      margin: 0 auto;
       width: 90%;
       max-width: 600px;
+      max-height: 85vh;
       border-radius: 12px;
       overflow: hidden;
       animation: modalOpen 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     }
 
     @keyframes modalOpen {
       from {
-        transform: translateY(20px);
+        transform: translateY(20px) scale(0.95);
         opacity: 0;
       }
       to {
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
         opacity: 1;
       }
     }
@@ -484,7 +490,7 @@
 
     .modal-header {
       width: 100%;
-      height: 300px;
+      height: 250px;
       overflow: hidden;
     }
 
@@ -496,18 +502,21 @@
 
     .modal-body {
       padding: 20px;
+      overflow-y: auto;
+      max-height: calc(85vh - 250px);
     }
 
     #modal-title {
       font-size: 24px;
       margin-bottom: 15px;
-      color: #333;
+      color: var(--tg-theme-text-color, #333);
+      font-weight: bold;
     }
 
     #modal-description {
       font-size: 16px;
       line-height: 1.5;
-      color: #666;
+      color: var(--tg-theme-hint-color, #666);
       margin-bottom: 20px;
     }
 
@@ -515,20 +524,26 @@
       margin-bottom: 20px;
     }
 
+    #modal-details .item-price {
+      color: var(--tg-theme-link-color, #007bff);
+      font-weight: bold;
+      font-size: 18px;
+    }
+
     .contact-button {
       width: 100%;
       padding: 15px;
-      background-color: #007bff;
-      color: white;
+      background-color: var(--tg-theme-button-color, #007bff);
+      color: var(--tg-theme-button-text-color, white);
       border: none;
       border-radius: 8px;
       font-size: 16px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: opacity 0.3s;
     }
 
     .contact-button:hover {
-      background-color: #0056b3;
+      opacity: 0.9;
     }
 
     /* Обновите стили для карточек, добавив cursor: pointer */
@@ -1094,8 +1109,19 @@
       }
 
       // Показываем модальное окно
-      modal.style.display = 'block';
+      modal.style.display = 'flex';
       document.body.style.overflow = 'hidden'; // Запрещаем прокрутку основного контента
+      
+      // Применяем цвета Telegram WebApp если доступны
+      if (window.Telegram && window.Telegram.WebApp) {
+        const theme = window.Telegram.WebApp.themeParams;
+        document.documentElement.style.setProperty('--tg-theme-bg-color', theme.bg_color || '#ffffff');
+        document.documentElement.style.setProperty('--tg-theme-text-color', theme.text_color || '#000000');
+        document.documentElement.style.setProperty('--tg-theme-hint-color', theme.hint_color || '#999999');
+        document.documentElement.style.setProperty('--tg-theme-link-color', theme.link_color || '#2481cc');
+        document.documentElement.style.setProperty('--tg-theme-button-color', theme.button_color || '#2481cc');
+        document.documentElement.style.setProperty('--tg-theme-button-text-color', theme.button_text_color || '#ffffff');
+      }
     }
 
     // Добавляем обработчики событий для всех карточек
